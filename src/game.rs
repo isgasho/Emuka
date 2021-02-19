@@ -76,7 +76,7 @@ trait Save {
 }
 
 
-pub struct SaveFile {
+pub struct SaveFileTrait {
     name: String,
     data: Vec<u8>,
     file: File,
@@ -85,7 +85,9 @@ pub struct SaveFile {
 
 
 
-impl SaveFile {
+
+
+impl SaveFileTrait {
     pub fn new <S: AsRef<str>, P: AsRef<Path>> (name: S, path: P) -> Result<Self> {
         let mut file = File::open(path)?;
         let mut buffer = BufReader::new(file.try_clone()?);
@@ -104,7 +106,7 @@ impl SaveFile {
 }
 
 
-impl Save for SaveFile {
+impl Save for SaveFileTrait {
     fn name(&self) -> &str {
         &self.name
     }

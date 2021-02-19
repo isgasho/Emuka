@@ -1,14 +1,11 @@
 use color_eyre::eyre::Result;
-use emuka::emulators;
+use emuka::emulators::sameboy::init;
+
 
 fn main() -> Result<()> {
     color_eyre::install()?;
 
-    println!("I'm Emuka!");
-
-    unsafe {
-        crate::emulators::sameboy::bindings::emuka_testprint();
-    }
+    init();
     
     return Ok(());
 }
