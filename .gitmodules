@@ -1,0 +1,3 @@
+[submodule "emulators/SameBoy"]
+	path = emulators/SameBoy
+	url = https://github.com/ShinySaana/SameBoy

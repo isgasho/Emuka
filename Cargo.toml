@@ -9,3 +9,8 @@ edition = "2018"
 [dependencies]
 eyre = "0.6"
 color-eyre = "0.5"
+
+
+[build-dependencies]
+bindgen = "0.57"
+eyre = "0.6"
