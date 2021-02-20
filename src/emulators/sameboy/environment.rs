@@ -5,7 +5,9 @@ pub fn environment_callback(cmd: &EnvironmentCallbackCmd, data: &mut Environment
     println!("env cb called; cmd: {:?}; data: {:?}", cmd, data);
 
     match cmd {
-        GetVariable => get_variable(data)
+        GetVariable => get_variable(data),
+        GetSystemDirectory => get_system_directory(data),
+        GetSaveDirectory => get_system_directory(data)
     }
 }
 
@@ -19,7 +21,19 @@ fn get_variable(data: &mut EnvironmentCallbackData) -> bool {
                     return true;
                 }
             }
-        }
-    }
+        },
+        _ => return false 
+    };
     return false;
+}
+
+
+fn get_system_directory(data: &mut EnvironmentCallbackData) -> bool {
+    match data {
+        EnvironmentCallbackData::StringWrapper(wrapper) => {
+            wrapper.inner = Some(String::from("./game"));
+            return true;
+        }
+        _ => return false
+    }
 }
