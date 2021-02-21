@@ -2,6 +2,8 @@ use std::{path::PathBuf, process::{Command}};
 use std::env::set_current_dir;
 use std::fs::copy;
 
+use bindgen::EnumVariation;
+
 static SAMEBOY_HEADER_PATH: &str = "./libretro/libretro.h";
 static SAMEBOY_SOURCE_PATH: &str = "./libretro/libretro.c";
 static SAMEBOY_PATH: &str = "./emulators/SameBoy/";
@@ -41,6 +43,7 @@ fn build_sameboy() {
         // The input header we would like to generate
         // bindings for.
         .header(SAMEBOY_HEADER_PATH)
+        .default_enum_style(EnumVariation::Rust { non_exhaustive: false })
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))

@@ -516,183 +516,194 @@ fn bindgen_test_layout_max_align_t() {
         )
     );
 }
-pub const retro_language_RETRO_LANGUAGE_ENGLISH: retro_language = 0;
-pub const retro_language_RETRO_LANGUAGE_JAPANESE: retro_language = 1;
-pub const retro_language_RETRO_LANGUAGE_FRENCH: retro_language = 2;
-pub const retro_language_RETRO_LANGUAGE_SPANISH: retro_language = 3;
-pub const retro_language_RETRO_LANGUAGE_GERMAN: retro_language = 4;
-pub const retro_language_RETRO_LANGUAGE_ITALIAN: retro_language = 5;
-pub const retro_language_RETRO_LANGUAGE_DUTCH: retro_language = 6;
-pub const retro_language_RETRO_LANGUAGE_PORTUGUESE_BRAZIL: retro_language = 7;
-pub const retro_language_RETRO_LANGUAGE_PORTUGUESE_PORTUGAL: retro_language = 8;
-pub const retro_language_RETRO_LANGUAGE_RUSSIAN: retro_language = 9;
-pub const retro_language_RETRO_LANGUAGE_KOREAN: retro_language = 10;
-pub const retro_language_RETRO_LANGUAGE_CHINESE_TRADITIONAL: retro_language = 11;
-pub const retro_language_RETRO_LANGUAGE_CHINESE_SIMPLIFIED: retro_language = 12;
-pub const retro_language_RETRO_LANGUAGE_ESPERANTO: retro_language = 13;
-pub const retro_language_RETRO_LANGUAGE_POLISH: retro_language = 14;
-pub const retro_language_RETRO_LANGUAGE_VIETNAMESE: retro_language = 15;
-pub const retro_language_RETRO_LANGUAGE_ARABIC: retro_language = 16;
-pub const retro_language_RETRO_LANGUAGE_GREEK: retro_language = 17;
-pub const retro_language_RETRO_LANGUAGE_TURKISH: retro_language = 18;
-pub const retro_language_RETRO_LANGUAGE_LAST: retro_language = 19;
-pub const retro_language_RETRO_LANGUAGE_DUMMY: retro_language = 2147483647;
-pub type retro_language = ::std::os::raw::c_uint;
-pub const retro_key_RETROK_UNKNOWN: retro_key = 0;
-pub const retro_key_RETROK_FIRST: retro_key = 0;
-pub const retro_key_RETROK_BACKSPACE: retro_key = 8;
-pub const retro_key_RETROK_TAB: retro_key = 9;
-pub const retro_key_RETROK_CLEAR: retro_key = 12;
-pub const retro_key_RETROK_RETURN: retro_key = 13;
-pub const retro_key_RETROK_PAUSE: retro_key = 19;
-pub const retro_key_RETROK_ESCAPE: retro_key = 27;
-pub const retro_key_RETROK_SPACE: retro_key = 32;
-pub const retro_key_RETROK_EXCLAIM: retro_key = 33;
-pub const retro_key_RETROK_QUOTEDBL: retro_key = 34;
-pub const retro_key_RETROK_HASH: retro_key = 35;
-pub const retro_key_RETROK_DOLLAR: retro_key = 36;
-pub const retro_key_RETROK_AMPERSAND: retro_key = 38;
-pub const retro_key_RETROK_QUOTE: retro_key = 39;
-pub const retro_key_RETROK_LEFTPAREN: retro_key = 40;
-pub const retro_key_RETROK_RIGHTPAREN: retro_key = 41;
-pub const retro_key_RETROK_ASTERISK: retro_key = 42;
-pub const retro_key_RETROK_PLUS: retro_key = 43;
-pub const retro_key_RETROK_COMMA: retro_key = 44;
-pub const retro_key_RETROK_MINUS: retro_key = 45;
-pub const retro_key_RETROK_PERIOD: retro_key = 46;
-pub const retro_key_RETROK_SLASH: retro_key = 47;
-pub const retro_key_RETROK_0: retro_key = 48;
-pub const retro_key_RETROK_1: retro_key = 49;
-pub const retro_key_RETROK_2: retro_key = 50;
-pub const retro_key_RETROK_3: retro_key = 51;
-pub const retro_key_RETROK_4: retro_key = 52;
-pub const retro_key_RETROK_5: retro_key = 53;
-pub const retro_key_RETROK_6: retro_key = 54;
-pub const retro_key_RETROK_7: retro_key = 55;
-pub const retro_key_RETROK_8: retro_key = 56;
-pub const retro_key_RETROK_9: retro_key = 57;
-pub const retro_key_RETROK_COLON: retro_key = 58;
-pub const retro_key_RETROK_SEMICOLON: retro_key = 59;
-pub const retro_key_RETROK_LESS: retro_key = 60;
-pub const retro_key_RETROK_EQUALS: retro_key = 61;
-pub const retro_key_RETROK_GREATER: retro_key = 62;
-pub const retro_key_RETROK_QUESTION: retro_key = 63;
-pub const retro_key_RETROK_AT: retro_key = 64;
-pub const retro_key_RETROK_LEFTBRACKET: retro_key = 91;
-pub const retro_key_RETROK_BACKSLASH: retro_key = 92;
-pub const retro_key_RETROK_RIGHTBRACKET: retro_key = 93;
-pub const retro_key_RETROK_CARET: retro_key = 94;
-pub const retro_key_RETROK_UNDERSCORE: retro_key = 95;
-pub const retro_key_RETROK_BACKQUOTE: retro_key = 96;
-pub const retro_key_RETROK_a: retro_key = 97;
-pub const retro_key_RETROK_b: retro_key = 98;
-pub const retro_key_RETROK_c: retro_key = 99;
-pub const retro_key_RETROK_d: retro_key = 100;
-pub const retro_key_RETROK_e: retro_key = 101;
-pub const retro_key_RETROK_f: retro_key = 102;
-pub const retro_key_RETROK_g: retro_key = 103;
-pub const retro_key_RETROK_h: retro_key = 104;
-pub const retro_key_RETROK_i: retro_key = 105;
-pub const retro_key_RETROK_j: retro_key = 106;
-pub const retro_key_RETROK_k: retro_key = 107;
-pub const retro_key_RETROK_l: retro_key = 108;
-pub const retro_key_RETROK_m: retro_key = 109;
-pub const retro_key_RETROK_n: retro_key = 110;
-pub const retro_key_RETROK_o: retro_key = 111;
-pub const retro_key_RETROK_p: retro_key = 112;
-pub const retro_key_RETROK_q: retro_key = 113;
-pub const retro_key_RETROK_r: retro_key = 114;
-pub const retro_key_RETROK_s: retro_key = 115;
-pub const retro_key_RETROK_t: retro_key = 116;
-pub const retro_key_RETROK_u: retro_key = 117;
-pub const retro_key_RETROK_v: retro_key = 118;
-pub const retro_key_RETROK_w: retro_key = 119;
-pub const retro_key_RETROK_x: retro_key = 120;
-pub const retro_key_RETROK_y: retro_key = 121;
-pub const retro_key_RETROK_z: retro_key = 122;
-pub const retro_key_RETROK_LEFTBRACE: retro_key = 123;
-pub const retro_key_RETROK_BAR: retro_key = 124;
-pub const retro_key_RETROK_RIGHTBRACE: retro_key = 125;
-pub const retro_key_RETROK_TILDE: retro_key = 126;
-pub const retro_key_RETROK_DELETE: retro_key = 127;
-pub const retro_key_RETROK_KP0: retro_key = 256;
-pub const retro_key_RETROK_KP1: retro_key = 257;
-pub const retro_key_RETROK_KP2: retro_key = 258;
-pub const retro_key_RETROK_KP3: retro_key = 259;
-pub const retro_key_RETROK_KP4: retro_key = 260;
-pub const retro_key_RETROK_KP5: retro_key = 261;
-pub const retro_key_RETROK_KP6: retro_key = 262;
-pub const retro_key_RETROK_KP7: retro_key = 263;
-pub const retro_key_RETROK_KP8: retro_key = 264;
-pub const retro_key_RETROK_KP9: retro_key = 265;
-pub const retro_key_RETROK_KP_PERIOD: retro_key = 266;
-pub const retro_key_RETROK_KP_DIVIDE: retro_key = 267;
-pub const retro_key_RETROK_KP_MULTIPLY: retro_key = 268;
-pub const retro_key_RETROK_KP_MINUS: retro_key = 269;
-pub const retro_key_RETROK_KP_PLUS: retro_key = 270;
-pub const retro_key_RETROK_KP_ENTER: retro_key = 271;
-pub const retro_key_RETROK_KP_EQUALS: retro_key = 272;
-pub const retro_key_RETROK_UP: retro_key = 273;
-pub const retro_key_RETROK_DOWN: retro_key = 274;
-pub const retro_key_RETROK_RIGHT: retro_key = 275;
-pub const retro_key_RETROK_LEFT: retro_key = 276;
-pub const retro_key_RETROK_INSERT: retro_key = 277;
-pub const retro_key_RETROK_HOME: retro_key = 278;
-pub const retro_key_RETROK_END: retro_key = 279;
-pub const retro_key_RETROK_PAGEUP: retro_key = 280;
-pub const retro_key_RETROK_PAGEDOWN: retro_key = 281;
-pub const retro_key_RETROK_F1: retro_key = 282;
-pub const retro_key_RETROK_F2: retro_key = 283;
-pub const retro_key_RETROK_F3: retro_key = 284;
-pub const retro_key_RETROK_F4: retro_key = 285;
-pub const retro_key_RETROK_F5: retro_key = 286;
-pub const retro_key_RETROK_F6: retro_key = 287;
-pub const retro_key_RETROK_F7: retro_key = 288;
-pub const retro_key_RETROK_F8: retro_key = 289;
-pub const retro_key_RETROK_F9: retro_key = 290;
-pub const retro_key_RETROK_F10: retro_key = 291;
-pub const retro_key_RETROK_F11: retro_key = 292;
-pub const retro_key_RETROK_F12: retro_key = 293;
-pub const retro_key_RETROK_F13: retro_key = 294;
-pub const retro_key_RETROK_F14: retro_key = 295;
-pub const retro_key_RETROK_F15: retro_key = 296;
-pub const retro_key_RETROK_NUMLOCK: retro_key = 300;
-pub const retro_key_RETROK_CAPSLOCK: retro_key = 301;
-pub const retro_key_RETROK_SCROLLOCK: retro_key = 302;
-pub const retro_key_RETROK_RSHIFT: retro_key = 303;
-pub const retro_key_RETROK_LSHIFT: retro_key = 304;
-pub const retro_key_RETROK_RCTRL: retro_key = 305;
-pub const retro_key_RETROK_LCTRL: retro_key = 306;
-pub const retro_key_RETROK_RALT: retro_key = 307;
-pub const retro_key_RETROK_LALT: retro_key = 308;
-pub const retro_key_RETROK_RMETA: retro_key = 309;
-pub const retro_key_RETROK_LMETA: retro_key = 310;
-pub const retro_key_RETROK_LSUPER: retro_key = 311;
-pub const retro_key_RETROK_RSUPER: retro_key = 312;
-pub const retro_key_RETROK_MODE: retro_key = 313;
-pub const retro_key_RETROK_COMPOSE: retro_key = 314;
-pub const retro_key_RETROK_HELP: retro_key = 315;
-pub const retro_key_RETROK_PRINT: retro_key = 316;
-pub const retro_key_RETROK_SYSREQ: retro_key = 317;
-pub const retro_key_RETROK_BREAK: retro_key = 318;
-pub const retro_key_RETROK_MENU: retro_key = 319;
-pub const retro_key_RETROK_POWER: retro_key = 320;
-pub const retro_key_RETROK_EURO: retro_key = 321;
-pub const retro_key_RETROK_UNDO: retro_key = 322;
-pub const retro_key_RETROK_OEM_102: retro_key = 323;
-pub const retro_key_RETROK_LAST: retro_key = 324;
-pub const retro_key_RETROK_DUMMY: retro_key = 2147483647;
-pub type retro_key = ::std::os::raw::c_uint;
-pub const retro_mod_RETROKMOD_NONE: retro_mod = 0;
-pub const retro_mod_RETROKMOD_SHIFT: retro_mod = 1;
-pub const retro_mod_RETROKMOD_CTRL: retro_mod = 2;
-pub const retro_mod_RETROKMOD_ALT: retro_mod = 4;
-pub const retro_mod_RETROKMOD_META: retro_mod = 8;
-pub const retro_mod_RETROKMOD_NUMLOCK: retro_mod = 16;
-pub const retro_mod_RETROKMOD_CAPSLOCK: retro_mod = 32;
-pub const retro_mod_RETROKMOD_SCROLLOCK: retro_mod = 64;
-pub const retro_mod_RETROKMOD_DUMMY: retro_mod = 2147483647;
-pub type retro_mod = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_language {
+    RETRO_LANGUAGE_ENGLISH = 0,
+    RETRO_LANGUAGE_JAPANESE = 1,
+    RETRO_LANGUAGE_FRENCH = 2,
+    RETRO_LANGUAGE_SPANISH = 3,
+    RETRO_LANGUAGE_GERMAN = 4,
+    RETRO_LANGUAGE_ITALIAN = 5,
+    RETRO_LANGUAGE_DUTCH = 6,
+    RETRO_LANGUAGE_PORTUGUESE_BRAZIL = 7,
+    RETRO_LANGUAGE_PORTUGUESE_PORTUGAL = 8,
+    RETRO_LANGUAGE_RUSSIAN = 9,
+    RETRO_LANGUAGE_KOREAN = 10,
+    RETRO_LANGUAGE_CHINESE_TRADITIONAL = 11,
+    RETRO_LANGUAGE_CHINESE_SIMPLIFIED = 12,
+    RETRO_LANGUAGE_ESPERANTO = 13,
+    RETRO_LANGUAGE_POLISH = 14,
+    RETRO_LANGUAGE_VIETNAMESE = 15,
+    RETRO_LANGUAGE_ARABIC = 16,
+    RETRO_LANGUAGE_GREEK = 17,
+    RETRO_LANGUAGE_TURKISH = 18,
+    RETRO_LANGUAGE_LAST = 19,
+    RETRO_LANGUAGE_DUMMY = 2147483647,
+}
+impl retro_key {
+    pub const RETROK_FIRST: retro_key = retro_key::RETROK_UNKNOWN;
+}
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_key {
+    RETROK_UNKNOWN = 0,
+    RETROK_BACKSPACE = 8,
+    RETROK_TAB = 9,
+    RETROK_CLEAR = 12,
+    RETROK_RETURN = 13,
+    RETROK_PAUSE = 19,
+    RETROK_ESCAPE = 27,
+    RETROK_SPACE = 32,
+    RETROK_EXCLAIM = 33,
+    RETROK_QUOTEDBL = 34,
+    RETROK_HASH = 35,
+    RETROK_DOLLAR = 36,
+    RETROK_AMPERSAND = 38,
+    RETROK_QUOTE = 39,
+    RETROK_LEFTPAREN = 40,
+    RETROK_RIGHTPAREN = 41,
+    RETROK_ASTERISK = 42,
+    RETROK_PLUS = 43,
+    RETROK_COMMA = 44,
+    RETROK_MINUS = 45,
+    RETROK_PERIOD = 46,
+    RETROK_SLASH = 47,
+    RETROK_0 = 48,
+    RETROK_1 = 49,
+    RETROK_2 = 50,
+    RETROK_3 = 51,
+    RETROK_4 = 52,
+    RETROK_5 = 53,
+    RETROK_6 = 54,
+    RETROK_7 = 55,
+    RETROK_8 = 56,
+    RETROK_9 = 57,
+    RETROK_COLON = 58,
+    RETROK_SEMICOLON = 59,
+    RETROK_LESS = 60,
+    RETROK_EQUALS = 61,
+    RETROK_GREATER = 62,
+    RETROK_QUESTION = 63,
+    RETROK_AT = 64,
+    RETROK_LEFTBRACKET = 91,
+    RETROK_BACKSLASH = 92,
+    RETROK_RIGHTBRACKET = 93,
+    RETROK_CARET = 94,
+    RETROK_UNDERSCORE = 95,
+    RETROK_BACKQUOTE = 96,
+    RETROK_a = 97,
+    RETROK_b = 98,
+    RETROK_c = 99,
+    RETROK_d = 100,
+    RETROK_e = 101,
+    RETROK_f = 102,
+    RETROK_g = 103,
+    RETROK_h = 104,
+    RETROK_i = 105,
+    RETROK_j = 106,
+    RETROK_k = 107,
+    RETROK_l = 108,
+    RETROK_m = 109,
+    RETROK_n = 110,
+    RETROK_o = 111,
+    RETROK_p = 112,
+    RETROK_q = 113,
+    RETROK_r = 114,
+    RETROK_s = 115,
+    RETROK_t = 116,
+    RETROK_u = 117,
+    RETROK_v = 118,
+    RETROK_w = 119,
+    RETROK_x = 120,
+    RETROK_y = 121,
+    RETROK_z = 122,
+    RETROK_LEFTBRACE = 123,
+    RETROK_BAR = 124,
+    RETROK_RIGHTBRACE = 125,
+    RETROK_TILDE = 126,
+    RETROK_DELETE = 127,
+    RETROK_KP0 = 256,
+    RETROK_KP1 = 257,
+    RETROK_KP2 = 258,
+    RETROK_KP3 = 259,
+    RETROK_KP4 = 260,
+    RETROK_KP5 = 261,
+    RETROK_KP6 = 262,
+    RETROK_KP7 = 263,
+    RETROK_KP8 = 264,
+    RETROK_KP9 = 265,
+    RETROK_KP_PERIOD = 266,
+    RETROK_KP_DIVIDE = 267,
+    RETROK_KP_MULTIPLY = 268,
+    RETROK_KP_MINUS = 269,
+    RETROK_KP_PLUS = 270,
+    RETROK_KP_ENTER = 271,
+    RETROK_KP_EQUALS = 272,
+    RETROK_UP = 273,
+    RETROK_DOWN = 274,
+    RETROK_RIGHT = 275,
+    RETROK_LEFT = 276,
+    RETROK_INSERT = 277,
+    RETROK_HOME = 278,
+    RETROK_END = 279,
+    RETROK_PAGEUP = 280,
+    RETROK_PAGEDOWN = 281,
+    RETROK_F1 = 282,
+    RETROK_F2 = 283,
+    RETROK_F3 = 284,
+    RETROK_F4 = 285,
+    RETROK_F5 = 286,
+    RETROK_F6 = 287,
+    RETROK_F7 = 288,
+    RETROK_F8 = 289,
+    RETROK_F9 = 290,
+    RETROK_F10 = 291,
+    RETROK_F11 = 292,
+    RETROK_F12 = 293,
+    RETROK_F13 = 294,
+    RETROK_F14 = 295,
+    RETROK_F15 = 296,
+    RETROK_NUMLOCK = 300,
+    RETROK_CAPSLOCK = 301,
+    RETROK_SCROLLOCK = 302,
+    RETROK_RSHIFT = 303,
+    RETROK_LSHIFT = 304,
+    RETROK_RCTRL = 305,
+    RETROK_LCTRL = 306,
+    RETROK_RALT = 307,
+    RETROK_LALT = 308,
+    RETROK_RMETA = 309,
+    RETROK_LMETA = 310,
+    RETROK_LSUPER = 311,
+    RETROK_RSUPER = 312,
+    RETROK_MODE = 313,
+    RETROK_COMPOSE = 314,
+    RETROK_HELP = 315,
+    RETROK_PRINT = 316,
+    RETROK_SYSREQ = 317,
+    RETROK_BREAK = 318,
+    RETROK_MENU = 319,
+    RETROK_POWER = 320,
+    RETROK_EURO = 321,
+    RETROK_UNDO = 322,
+    RETROK_OEM_102 = 323,
+    RETROK_LAST = 324,
+    RETROK_DUMMY = 2147483647,
+}
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_mod {
+    RETROKMOD_NONE = 0,
+    RETROKMOD_SHIFT = 1,
+    RETROKMOD_CTRL = 2,
+    RETROKMOD_ALT = 4,
+    RETROKMOD_META = 8,
+    RETROKMOD_NUMLOCK = 16,
+    RETROKMOD_CAPSLOCK = 32,
+    RETROKMOD_SCROLLOCK = 64,
+    RETROKMOD_DUMMY = 2147483647,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct retro_vfs_file_handle {
@@ -1053,21 +1064,17 @@ fn bindgen_test_layout_retro_vfs_interface_info() {
         )
     );
 }
-pub const retro_hw_render_interface_type_RETRO_HW_RENDER_INTERFACE_VULKAN:
-    retro_hw_render_interface_type = 0;
-pub const retro_hw_render_interface_type_RETRO_HW_RENDER_INTERFACE_D3D9:
-    retro_hw_render_interface_type = 1;
-pub const retro_hw_render_interface_type_RETRO_HW_RENDER_INTERFACE_D3D10:
-    retro_hw_render_interface_type = 2;
-pub const retro_hw_render_interface_type_RETRO_HW_RENDER_INTERFACE_D3D11:
-    retro_hw_render_interface_type = 3;
-pub const retro_hw_render_interface_type_RETRO_HW_RENDER_INTERFACE_D3D12:
-    retro_hw_render_interface_type = 4;
-pub const retro_hw_render_interface_type_RETRO_HW_RENDER_INTERFACE_GSKIT_PS2:
-    retro_hw_render_interface_type = 5;
-pub const retro_hw_render_interface_type_RETRO_HW_RENDER_INTERFACE_DUMMY:
-    retro_hw_render_interface_type = 2147483647;
-pub type retro_hw_render_interface_type = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_hw_render_interface_type {
+    RETRO_HW_RENDER_INTERFACE_VULKAN = 0,
+    RETRO_HW_RENDER_INTERFACE_D3D9 = 1,
+    RETRO_HW_RENDER_INTERFACE_D3D10 = 2,
+    RETRO_HW_RENDER_INTERFACE_D3D11 = 3,
+    RETRO_HW_RENDER_INTERFACE_D3D12 = 4,
+    RETRO_HW_RENDER_INTERFACE_GSKIT_PS2 = 5,
+    RETRO_HW_RENDER_INTERFACE_DUMMY = 2147483647,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct retro_hw_render_interface {
@@ -1228,9 +1235,12 @@ fn bindgen_test_layout_retro_midi_interface() {
         )
     );
 }
-pub const retro_hw_render_context_negotiation_interface_type_RETRO_HW_RENDER_CONTEXT_NEGOTIATION_INTERFACE_VULKAN : retro_hw_render_context_negotiation_interface_type = 0 ;
-pub const retro_hw_render_context_negotiation_interface_type_RETRO_HW_RENDER_CONTEXT_NEGOTIATION_INTERFACE_DUMMY : retro_hw_render_context_negotiation_interface_type = 2147483647 ;
-pub type retro_hw_render_context_negotiation_interface_type = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_hw_render_context_negotiation_interface_type {
+    RETRO_HW_RENDER_CONTEXT_NEGOTIATION_INTERFACE_VULKAN = 0,
+    RETRO_HW_RENDER_CONTEXT_NEGOTIATION_INTERFACE_DUMMY = 2147483647,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct retro_hw_render_context_negotiation_interface {
@@ -1770,12 +1780,15 @@ fn bindgen_test_layout_retro_get_proc_address_interface() {
         )
     );
 }
-pub const retro_log_level_RETRO_LOG_DEBUG: retro_log_level = 0;
-pub const retro_log_level_RETRO_LOG_INFO: retro_log_level = 1;
-pub const retro_log_level_RETRO_LOG_WARN: retro_log_level = 2;
-pub const retro_log_level_RETRO_LOG_ERROR: retro_log_level = 3;
-pub const retro_log_level_RETRO_LOG_DUMMY: retro_log_level = 2147483647;
-pub type retro_log_level = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_log_level {
+    RETRO_LOG_DEBUG = 0,
+    RETRO_LOG_INFO = 1,
+    RETRO_LOG_WARN = 2,
+    RETRO_LOG_ERROR = 3,
+    RETRO_LOG_DUMMY = 2147483647,
+}
 pub type retro_log_printf_t = ::std::option::Option<
     unsafe extern "C" fn(level: retro_log_level, fmt: *const ::std::os::raw::c_char, ...),
 >;
@@ -1994,10 +2007,13 @@ fn bindgen_test_layout_retro_perf_callback() {
         )
     );
 }
-pub const retro_sensor_action_RETRO_SENSOR_ACCELEROMETER_ENABLE: retro_sensor_action = 0;
-pub const retro_sensor_action_RETRO_SENSOR_ACCELEROMETER_DISABLE: retro_sensor_action = 1;
-pub const retro_sensor_action_RETRO_SENSOR_DUMMY: retro_sensor_action = 2147483647;
-pub type retro_sensor_action = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_sensor_action {
+    RETRO_SENSOR_ACCELEROMETER_ENABLE = 0,
+    RETRO_SENSOR_ACCELEROMETER_DISABLE = 1,
+    RETRO_SENSOR_DUMMY = 2147483647,
+}
 pub type retro_set_sensor_state_t = ::std::option::Option<
     unsafe extern "C" fn(
         port: ::std::os::raw::c_uint,
@@ -2051,10 +2067,13 @@ fn bindgen_test_layout_retro_sensor_interface() {
         )
     );
 }
-pub const retro_camera_buffer_RETRO_CAMERA_BUFFER_OPENGL_TEXTURE: retro_camera_buffer = 0;
-pub const retro_camera_buffer_RETRO_CAMERA_BUFFER_RAW_FRAMEBUFFER: retro_camera_buffer = 1;
-pub const retro_camera_buffer_RETRO_CAMERA_BUFFER_DUMMY: retro_camera_buffer = 2147483647;
-pub type retro_camera_buffer = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_camera_buffer {
+    RETRO_CAMERA_BUFFER_OPENGL_TEXTURE = 0,
+    RETRO_CAMERA_BUFFER_RAW_FRAMEBUFFER = 1,
+    RETRO_CAMERA_BUFFER_DUMMY = 2147483647,
+}
 pub type retro_camera_start_t = ::std::option::Option<unsafe extern "C" fn() -> bool>;
 pub type retro_camera_stop_t = ::std::option::Option<unsafe extern "C" fn()>;
 pub type retro_camera_lifetime_status_t = ::std::option::Option<unsafe extern "C" fn()>;
@@ -2307,10 +2326,13 @@ fn bindgen_test_layout_retro_location_callback() {
         )
     );
 }
-pub const retro_rumble_effect_RETRO_RUMBLE_STRONG: retro_rumble_effect = 0;
-pub const retro_rumble_effect_RETRO_RUMBLE_WEAK: retro_rumble_effect = 1;
-pub const retro_rumble_effect_RETRO_RUMBLE_DUMMY: retro_rumble_effect = 2147483647;
-pub type retro_rumble_effect = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_rumble_effect {
+    RETRO_RUMBLE_STRONG = 0,
+    RETRO_RUMBLE_WEAK = 1,
+    RETRO_RUMBLE_DUMMY = 2147483647,
+}
 pub type retro_set_rumble_state_t = ::std::option::Option<
     unsafe extern "C" fn(
         port: ::std::os::raw::c_uint,
@@ -2442,16 +2464,19 @@ pub type retro_hw_get_current_framebuffer_t =
 pub type retro_hw_get_proc_address_t = ::std::option::Option<
     unsafe extern "C" fn(sym: *const ::std::os::raw::c_char) -> retro_proc_address_t,
 >;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_NONE: retro_hw_context_type = 0;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_OPENGL: retro_hw_context_type = 1;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_OPENGLES2: retro_hw_context_type = 2;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_OPENGL_CORE: retro_hw_context_type = 3;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_OPENGLES3: retro_hw_context_type = 4;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_OPENGLES_VERSION: retro_hw_context_type = 5;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_VULKAN: retro_hw_context_type = 6;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_DIRECT3D: retro_hw_context_type = 7;
-pub const retro_hw_context_type_RETRO_HW_CONTEXT_DUMMY: retro_hw_context_type = 2147483647;
-pub type retro_hw_context_type = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_hw_context_type {
+    RETRO_HW_CONTEXT_NONE = 0,
+    RETRO_HW_CONTEXT_OPENGL = 1,
+    RETRO_HW_CONTEXT_OPENGLES2 = 2,
+    RETRO_HW_CONTEXT_OPENGL_CORE = 3,
+    RETRO_HW_CONTEXT_OPENGLES3 = 4,
+    RETRO_HW_CONTEXT_OPENGLES_VERSION = 5,
+    RETRO_HW_CONTEXT_VULKAN = 6,
+    RETRO_HW_CONTEXT_DIRECT3D = 7,
+    RETRO_HW_CONTEXT_DUMMY = 2147483647,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct retro_hw_render_callback {
@@ -2793,11 +2818,14 @@ fn bindgen_test_layout_retro_disk_control_callback() {
         )
     );
 }
-pub const retro_pixel_format_RETRO_PIXEL_FORMAT_0RGB1555: retro_pixel_format = 0;
-pub const retro_pixel_format_RETRO_PIXEL_FORMAT_XRGB8888: retro_pixel_format = 1;
-pub const retro_pixel_format_RETRO_PIXEL_FORMAT_RGB565: retro_pixel_format = 2;
-pub const retro_pixel_format_RETRO_PIXEL_FORMAT_UNKNOWN: retro_pixel_format = 2147483647;
-pub type retro_pixel_format = ::std::os::raw::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum retro_pixel_format {
+    RETRO_PIXEL_FORMAT_0RGB1555 = 0,
+    RETRO_PIXEL_FORMAT_XRGB8888 = 1,
+    RETRO_PIXEL_FORMAT_RGB565 = 2,
+    RETRO_PIXEL_FORMAT_UNKNOWN = 2147483647,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct retro_message {

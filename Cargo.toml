@@ -11,6 +11,7 @@ eyre = "0.6"
 color-eyre = "0.5"
 lazy_static = "1.4"
 num_enum = "0.5.1"
+cpal = "0.13.1"
 
 [build-dependencies]
 bindgen = "0.57"
