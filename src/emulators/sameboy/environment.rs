@@ -12,6 +12,8 @@ pub fn environment_callback(cmd: &EnvironmentCallbackCmd, data: &mut Environment
         GetSaveDirectory => get_system_directory(data),
         
         SetPixelFormat => set_pixel_format(data),
+
+        GetInputBitmask => true
     }
 }
 

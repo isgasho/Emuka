@@ -34,11 +34,17 @@ pub fn init() {
     wrapper::init();
 
     let game_info = wrapper::GameInfo {
-        path: String::from("./game/tbc_player.gb")
+        path: String::from("./game/lsdj4.5.1_TBC.gb")
     };
 
     wrapper::load_game(&game_info);
     
+    println!("====================");
+
+    wrapper::load_save("./game/lsdj4.5.1_TBC.sav");
+    
+    run_x_frames(300);
+    input::store_input(wrapper::SameboyJoypadInput::START);
     run_x_frames(21600);
     loop {}
 

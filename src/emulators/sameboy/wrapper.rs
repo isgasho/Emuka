@@ -1,5 +1,5 @@
 use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::{self, Path}, sync::RwLock};
-use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, emuka_save_battery, emuka_set_audio_frequency, retro_set_input_poll};
+use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, RETRO_ENVIRONMENT_EXPERIMENTAL, RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, emuka_save_battery, emuka_set_audio_frequency, retro_set_input_poll};
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
 use eyre::*;
@@ -14,13 +14,16 @@ pub enum EnvironmentCallbackCmd {
     GetSaveDirectory = bindings::RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY,
 
     SetPixelFormat = bindings::RETRO_ENVIRONMENT_SET_PIXEL_FORMAT,
+
+    GetInputBitmask = bindings::RETRO_ENVIRONMENT_GET_INPUT_BITMASKS,
 }
 
 #[derive(Debug)]
 pub enum EnvironmentCallbackData {
     RetroVariable(RetroVariable),
     StringWrapper(StringWrapper),
-    IntWrapper(IntWrapper)
+    IntWrapper(IntWrapper),
+    Nothing,
 }
 
 impl EnvironmentCallbackData {
@@ -32,6 +35,7 @@ impl EnvironmentCallbackData {
             GetSystemDirectory => Self::StringWrapper(StringWrapper::from_void_ptr(data)?),
             GetSaveDirectory => Self::StringWrapper(StringWrapper::from_void_ptr(data)?),
             SetPixelFormat => Self::IntWrapper(IntWrapper::from_void_ptr(data)?),
+            GetInputBitmask => Self::Nothing
         })
     }
 
@@ -47,13 +51,14 @@ impl EnvironmentCallbackData {
             },
             IntWrapper(wrapper) => {
                 wrapper.repopulate_void_ptr(data)?
-            }
+            },
+            Nothing => {}
         })
     }
 }
 #[repr(u32)]
 #[derive(TryFromPrimitive, Debug)]
-pub enum JoypadInput {
+pub enum SameboyJoypadInput {
     A = bindings::RETRO_DEVICE_ID_JOYPAD_A,
     B = bindings::RETRO_DEVICE_ID_JOYPAD_B,
 
@@ -68,7 +73,7 @@ pub enum JoypadInput {
 
 pub type EnvironmentCallback = fn(cmd: &EnvironmentCallbackCmd, data: &mut EnvironmentCallbackData) -> bool;
 pub type InputPollCallback = fn();
-pub type InputStateCallback = fn(JoypadInput) -> i16;
+pub type InputStateCallback = fn() -> i16;
 pub type AudioSampleCallback = fn(i16, i16);
 pub type VideoRefreshCallback = fn(&[u32], u32, u32, u64);
 
@@ -330,27 +335,19 @@ pub fn set_input_poll_cb(cb: InputPollCallback) {
     }
 }
 
-fn input_state_call(cb: InputStateCallback, input: u32) -> i16 {
-    match JoypadInput::try_from(input) {
-        Ok(input) => {
-            let cb_result = catch_unwind(|| cb(input));
+fn input_state_call(cb: InputStateCallback) -> i16 {
+    let cb_result = catch_unwind(|| cb());
 
-            match cb_result {
-                Ok(result) => result,
-                Err(err) => {
-                    println!("{:?}", err);
-                    0
-                }
-            }
-        },
+    match cb_result {
+        Ok(result) => result,
         Err(err) => {
-            // println!("{:?}", err);
+            println!("{:?}", err);
             0
         }
     }
 }
 
-unsafe extern "C" fn input_state_cb(_port: u32, _device: u32, _index: u32, id: u32) -> i16 {
+unsafe extern "C" fn input_state_cb(_port: u32, _device: u32, _index: u32, _id: u32) -> i16 {
     let cb_lock_result = INPUT_STATE_CALLBACK_GLOBAL.read();
     match cb_lock_result {
         Err(_) => 0i16,
@@ -358,7 +355,7 @@ unsafe extern "C" fn input_state_cb(_port: u32, _device: u32, _index: u32, id: u
             match *cb_lock {
                 None => 0i16,
                 Some(cb) => {
-                    input_state_call(cb, id)
+                    input_state_call(cb)
                 }
             }
         }
@@ -471,6 +468,17 @@ pub fn deinit() {
     unsafe {
         bindings::retro_deinit();
     }
+}
+
+pub fn load_save <P: AsRef<Path>> (path: P) {
+    let cstring = CString::new(path.as_ref().to_str().unwrap()).unwrap();
+    let cstr_ptr = cstring.into_raw();
+
+    unsafe {
+        bindings::emuka_load_battery(cstr_ptr);
+    }
+
+    let cstr = unsafe { CString::from_raw(cstr_ptr) };
 }
 
 pub fn save <P: AsRef<Path>> (path: P) {
