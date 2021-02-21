@@ -235,7 +235,7 @@ unsafe fn environ_cb_call(cb: EnvironmentCallback, cmd: u32, data: *mut c_void) 
             }
         },
         Err(err) => {
-            println!("{:?}", err);
+            // println!("{:?}", err);
             false
         }
     }
@@ -243,7 +243,7 @@ unsafe fn environ_cb_call(cb: EnvironmentCallback, cmd: u32, data: *mut c_void) 
 
 
 unsafe extern "C" fn environ_cb(cmd: u32, data: *mut c_void) -> bool {
-    println!("extern cb, cmd: {}", cmd);
+    // println!("extern cb, cmd: {}", cmd);
 
     let cb_lock_result = ENVIRON_CALLBACK_GLOBAL.read();
     match cb_lock_result {

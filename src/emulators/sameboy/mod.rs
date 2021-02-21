@@ -9,19 +9,20 @@ mod audio;
 mod video;
 
 
-fn run_60_frames() {
+fn run_x_frames(x: u32) {
     let start = Instant::now();
 
-    for _ in 0..60 {
+    for _ in 0..x {
         wrapper::run_frame();
     }
 
     let elapsed = start.elapsed();
 
-    println!("Duration of 60 frames: {:?}ms", elapsed.as_millis());
+    println!("Duration of {} frames: {:?}ms", x, elapsed.as_millis());
 }
 
 pub fn init() {
+    let stream = audio::init_audio();
     wrapper::set_environment_cb(environment::environment_callback);
     wrapper::set_input_poll_cb(input::input_poll);
     wrapper::set_input_state_cb(input::input_state);
@@ -36,6 +37,6 @@ pub fn init() {
 
     wrapper::load_game(&game_info);
     
-    run_60_frames();
+    run_x_frames(1200);
 }
 
