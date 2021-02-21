@@ -9,7 +9,7 @@ struct StereoSample {
     pub right: i16
 }
 
-static SAMPLE_RATE: u32 = 384000;
+pub static SAMPLE_RATE: u32 = 48000;
 lazy_static! {
     static ref SAMPLES: Mutex<VecDeque<StereoSample>> = Mutex::new(VecDeque::with_capacity(SAMPLE_RATE as usize * 20usize));
 }

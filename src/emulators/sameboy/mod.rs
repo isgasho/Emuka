@@ -23,8 +23,8 @@ fn run_x_frames(x: u32) {
 
 pub fn init() {
     let _stream = audio::init_audio();
-    loop {}
 
+    wrapper::set_audio_frequency(audio::SAMPLE_RATE);
     wrapper::set_environment_cb(environment::environment_callback);
     wrapper::set_input_poll_cb(input::input_poll);
     wrapper::set_input_state_cb(input::input_state);

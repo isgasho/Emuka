@@ -3675,3 +3675,6 @@ extern "C" {
 extern "C" {
     pub fn emuka_save_battery(path: *const ::std::os::raw::c_char);
 }
+extern "C" {
+    pub fn emuka_set_audio_frequency(frequency: ::std::os::raw::c_uint);
+}

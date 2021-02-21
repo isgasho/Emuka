@@ -1,5 +1,5 @@
 use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::{self, Path}, sync::RwLock};
-use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, emuka_save_battery, retro_set_input_poll};
+use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, emuka_save_battery, emuka_set_audio_frequency, retro_set_input_poll};
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
 use eyre::*;
@@ -482,4 +482,10 @@ pub fn save <P: AsRef<Path>> (path: P) {
     }
 
     let cstr = unsafe { CString::from_raw(cstr_ptr) };
+}
+
+pub fn set_audio_frequency(frequency: u32) {
+    unsafe {
+        bindings::emuka_set_audio_frequency(frequency);
+    }
 }
