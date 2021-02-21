@@ -1,6 +1,6 @@
 use std::{collections::VecDeque, sync::{Mutex, RwLock, atomic::{AtomicUsize, Ordering}}};
 
-use cpal::{OutputCallbackInfo, SampleFormat, SampleRate, Stream, traits::{DeviceTrait, HostTrait, StreamTrait}};
+use cpal::{OutputCallbackInfo, SampleFormat, SampleRate, Stream, SupportedStreamConfigRange, traits::{DeviceTrait, HostTrait, StreamTrait}};
 use lazy_static::lazy_static;
 
 
@@ -25,11 +25,30 @@ pub fn init_audio() -> Stream {
     let host = cpal::default_host();
     let device = host.default_output_device().expect("no output device available");
     println!("{}", device.name().unwrap());
-    let mut supported_configs_range = device.supported_output_configs()
+    let supported_configs_range = device.supported_output_configs()
     .expect("error while querying configs");
-    let supported_config = supported_configs_range.skip(1).next()
-    .expect("no supported config?!")
-    .with_sample_rate(SampleRate(SAMPLE_RATE));
+    let appropriate_configs: Vec<SupportedStreamConfigRange> = supported_configs_range
+    .filter(|conf| conf.channels() == 2)
+    .filter(|conf| conf.max_sample_rate() >= SampleRate(SAMPLE_RATE))
+    .collect();
+
+    println!("number of appropriate configs: {}", appropriate_configs.len());
+
+    if appropriate_configs.is_empty() {
+        panic!("Unsupported on this host device")
+    }
+
+    let perfect_config = appropriate_configs.iter()
+        .find(|conf| conf.sample_format() == SampleFormat::I16);
+
+    let supported_config = match perfect_config {
+        Some(config) => {
+            println!("Perfect config found!");
+            config.clone()
+        },
+        None => appropriate_configs.get(0).unwrap().clone()
+    }.with_sample_rate(SampleRate(SAMPLE_RATE));
+
     let config = supported_config;
     println!("{:?}", config);
     let sample_format = config.sample_format();
@@ -47,7 +66,6 @@ pub fn init_audio() -> Stream {
 
 fn run<T>(device: &cpal::Device, config: &cpal::StreamConfig) -> Stream where
 T: cpal::Sample {
-    let sample_rate = config.sample_rate.0 as f32;
     let channels = config.channels as usize;
 
 
@@ -81,14 +99,3 @@ T: cpal::Sample {
         }
     }
 }
-
-
-// fn get_samples(buffer: &mut [i16], _:&OutputCallbackInfo) {
-//     let mut left_lock = LEFT_CHANNEL_SAMPLES.write().unwrap();
-//     let drain_length = buffer.len().min((*left_lock).len());
-//     let left_channel_data = (*left_lock).drain(..drain_length);
-//     for (i, sample) in left_channel_data.enumerate() {
-//         buffer[i] = sample;
-//     }
-    
-// }

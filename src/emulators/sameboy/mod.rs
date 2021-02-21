@@ -23,6 +23,8 @@ fn run_x_frames(x: u32) {
 
 pub fn init() {
     let _stream = audio::init_audio();
+    loop {}
+
     wrapper::set_environment_cb(environment::environment_callback);
     wrapper::set_input_poll_cb(input::input_poll);
     wrapper::set_input_state_cb(input::input_state);
@@ -32,15 +34,17 @@ pub fn init() {
     wrapper::init();
 
     let game_info = wrapper::GameInfo {
-        path: String::from("./game/lsdj.gb")
+        path: String::from("./game/tbc_player.gb")
     };
 
     wrapper::load_game(&game_info);
     
-    run_x_frames(12000);
+    run_x_frames(21600);
+    loop {}
 
-    wrapper::save("./game/lsdj.sav");
+    // wrapper::save("./game/lsdj.sav");
     wrapper::unload_game();
     wrapper::deinit();
+    
 }
 
