@@ -1,5 +1,5 @@
-use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path, sync::RwLock};
-use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, retro_set_input_poll};
+use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::{self, Path}, sync::RwLock};
+use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, emuka_save_battery, retro_set_input_poll};
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
 use eyre::*;
@@ -459,4 +459,27 @@ pub fn set_video_refresh_cb(cb: VideoRefreshCallback) {
     unsafe {
         bindings::retro_set_video_refresh(Some(video_refresh_cb));
     }
+}
+
+pub fn unload_game() {
+    unsafe {
+        bindings::retro_unload_game();
+    }
+}
+
+pub fn deinit() {
+    unsafe {
+        bindings::retro_deinit();
+    }
+}
+
+pub fn save <P: AsRef<Path>> (path: P) {
+    let cstring = CString::new(path.as_ref().to_str().unwrap()).unwrap();
+    let cstr_ptr = cstring.into_raw();
+
+    unsafe {
+        bindings::emuka_save_battery(cstr_ptr);
+    }
+
+    let cstr = unsafe { CString::from_raw(cstr_ptr) };
 }

@@ -22,7 +22,7 @@ fn run_x_frames(x: u32) {
 }
 
 pub fn init() {
-    let stream = audio::init_audio();
+    let _stream = audio::init_audio();
     wrapper::set_environment_cb(environment::environment_callback);
     wrapper::set_input_poll_cb(input::input_poll);
     wrapper::set_input_state_cb(input::input_state);
@@ -37,6 +37,10 @@ pub fn init() {
 
     wrapper::load_game(&game_info);
     
-    run_x_frames(1200);
+    run_x_frames(12000);
+
+    wrapper::save("./game/lsdj.sav");
+    wrapper::unload_game();
+    wrapper::deinit();
 }
 

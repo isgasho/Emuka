@@ -3673,5 +3673,5 @@ extern "C" {
     pub fn retro_get_memory_size(id: ::std::os::raw::c_uint) -> size_t;
 }
 extern "C" {
-    pub fn emuka_testprint();
+    pub fn emuka_save_battery(path: *const ::std::os::raw::c_char);
 }
