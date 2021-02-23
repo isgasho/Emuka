@@ -38,7 +38,9 @@ pub async fn init() {
         let command = receiver.recv().await;
         
         match command {
-            Some(command) => emulator.handle_command(command),
+            Some(command) => if !emulator.handle_command(command) {
+                break;
+            },
             None => break
         };
     }
