@@ -1,8 +1,12 @@
 pub mod sameboy;
 
-use std::sync::Arc;
+use std::{path::PathBuf};
 
-use crate::game::{Game, Save};
+use tokio::{sync::mpsc::{UnboundedSender, unbounded_channel}, time};
+
+use crate::game::{Game, GameFromFile, Save, SaveFile};
+
+use self::sameboy::SameBoyEmulator;
 
 pub trait Emulator {
     fn init(&mut self);
@@ -21,7 +25,7 @@ pub enum EmulatorCommand {
     Stop,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Deserialize, Copy, Clone)]
 pub enum EmulatorJoypadInput {
     A,
     B,
@@ -31,4 +35,47 @@ pub enum EmulatorJoypadInput {
     DOWN,
     RIGHT,
     LEFT
+}
+
+pub async fn init() -> UnboundedSender<EmulatorCommand> {
+    let mut emulator = SameBoyEmulator::default();
+    emulator.init();
+
+    let (sender, mut receiver) = unbounded_channel::<EmulatorCommand>();
+    let sender_interval = sender.clone();
+    let sender_command = sender.clone();
+
+    let mut interval = time::interval(time::Duration::from_nanos(1_000_000_000 / 60));
+
+
+    tokio::spawn(async move {
+        loop {
+            interval.tick().await;
+            sender_interval.send(EmulatorCommand::RunFrame).unwrap();
+        }
+    });
+
+    tokio::spawn(async move {
+        time::sleep(time::Duration::from_secs(5)).await;
+        sender_command.send(EmulatorCommand::Input(EmulatorJoypadInput::START)).unwrap();
+    });
+
+    
+    tokio::spawn( async move {
+        loop {
+            let command = receiver.recv().await;
+            
+            match command {
+                Some(command) => if !emulator.handle_command(command) {
+                    break;
+                },
+                None => break
+            };
+        }
+
+        println!("Emulator uninit");
+        emulator.uninit();
+    });
+
+    sender
 }

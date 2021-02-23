@@ -20,7 +20,7 @@ pub struct SameBoyEmulator {
     save_path: Option<String>,
     instant: Option<std::time::Instant>,
     frames: usize,
-    paused: bool
+    running: bool
 }
 
 impl SameBoyEmulator {
@@ -34,6 +34,7 @@ impl SameBoyEmulator {
         };
 
         wrapper::load_game(&game_info);
+        println!("Game loaded");
     }
 
     fn load_save(&mut self, save: Box<dyn game::Save>) {
@@ -41,7 +42,8 @@ impl SameBoyEmulator {
             .to_str().unwrap()
             .to_owned());
 
-        wrapper::load_save(self.save_path.as_ref().unwrap())
+        wrapper::load_save(self.save_path.as_ref().unwrap());
+        println!("Save loaded");
     }
 }
 
@@ -64,15 +66,15 @@ impl super::Emulator for SameBoyEmulator {
         
         match command {
             RunFrame => {
-                if !self.paused {
+                if self.running {
                     wrapper::run_frame();
                 }
-                self.frames = self.frames + 1;
-                if self.frames % 60 == 0 {
-                    let elapsed = self.instant.unwrap().elapsed().as_millis();
-                    println!("Ran 60 frames in {}ms", elapsed);
-                    self.instant = Some(Instant::now());
-                }
+                // self.frames = self.frames + 1;
+                // if self.frames % 60 == 0 {
+                //     let elapsed = self.instant.unwrap().elapsed().as_millis();
+                //     println!("Ran 60 frames in {}ms", elapsed);
+                //     self.instant = Some(Instant::now());
+                // }
             },
             Input(input) => {
                let sb_input = wrapper::SameboyJoypadInput::from(input);
@@ -81,8 +83,8 @@ impl super::Emulator for SameBoyEmulator {
             Stop => return false,
             LoadGame(game) => self.load_game(game),
             LoadSave(save) => self.load_save(save),
-            Pause => self.paused = true,
-            Resume => self.paused = false,
+            Pause => self.running = false,
+            Resume => self.running = true,
         };
 
         true

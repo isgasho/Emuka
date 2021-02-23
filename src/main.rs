@@ -4,7 +4,9 @@ use color_eyre::eyre::Result;
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
-    emuka::init().await;
+    let _stream = emuka::audio::init_audio(); 
+    let sender = emuka::emulators::init().await;
+    emuka::server::init(sender).await;
     
     return Ok(());
 }
