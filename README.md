@@ -15,6 +15,5 @@ Should build out of the box on Linux with a `cargo build`, not currently tested 
 
 ## Run
 
-`cargo run` will attempt to find a file called "./game/lsdj.gb" that you must provide, and will also attempt to connect to your default stereo interface (in a very unreliable manner, admitedly).  
+`cargo run` will attempt to load a file called "./game/lsdj.gb" that you must provide, and will also attempt to connect to your default stereo interface.
 Provided that both works, you should hear the gameboy color boot sound!
-After a minute or two, a save should be generated at "./game/lsdj.sav"!

@@ -24,9 +24,10 @@ pub async fn init() {
     save_path.push(emulators::sameboy::PATH);
     save_path.set_extension("sav");
 
-    let save = Box::new(
-        SaveFile::new("LSDj", save_path.into_boxed_path()).unwrap()
-    );
+    let save = match SaveFile::new("LSDj", save_path.into_boxed_path()) {
+        Ok(save_file) => Some(Box::new(save_file)),
+        Err(_) => None
+    };
 
 
 
@@ -35,7 +36,10 @@ pub async fn init() {
     let sender_command = sender.clone();
 
     sender.send(EmulatorCommand::LoadGame(game)).unwrap();
-    sender.send(EmulatorCommand::LoadSave(save)).unwrap();
+
+    if let Some(save) = save {
+        sender.send(EmulatorCommand::LoadSave(save)).unwrap();
+    }
 
     let mut interval = time::interval(time::Duration::from_nanos(1_000_000_000 / 60));
 
