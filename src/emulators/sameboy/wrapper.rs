@@ -493,7 +493,7 @@ pub fn load_save <P: AsRef<Path>> (path: P) {
         bindings::emuka_load_battery(cstr_ptr);
     }
 
-    let cstr = unsafe { CString::from_raw(cstr_ptr) };
+    unsafe { CString::from_raw(cstr_ptr) };
 }
 
 pub fn save <P: AsRef<Path>> (path: P) {
@@ -504,7 +504,7 @@ pub fn save <P: AsRef<Path>> (path: P) {
         bindings::emuka_save_battery(cstr_ptr);
     }
 
-    let cstr = unsafe { CString::from_raw(cstr_ptr) };
+    unsafe { CString::from_raw(cstr_ptr) };
 }
 
 pub fn set_audio_frequency(frequency: u32) {

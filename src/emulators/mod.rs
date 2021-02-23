@@ -1,17 +1,22 @@
 pub mod sameboy;
 
-use crate::game::Game;
+use std::sync::Arc;
+
+use crate::game::{Game, Save};
 
 pub trait Emulator {
     fn init(&mut self);
-    fn load_game(&mut self, game_path: String);
     fn handle_command(&mut self, command: EmulatorCommand) -> bool;
     fn uninit(&mut self);
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub enum EmulatorCommand {
+    LoadGame(Box<dyn Game>),
+    LoadSave(Box<dyn Save>),
     RunFrame,
+    Pause,
+    Resume,
     Input(EmulatorJoypadInput),
     Stop,
 }

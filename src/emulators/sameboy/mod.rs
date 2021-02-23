@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use crate::game;
+use crate::game::{self, Game};
 
 use super::EmulatorCommand;
 
@@ -12,19 +12,6 @@ mod input;
 mod audio;
 mod video;
 
-
-fn run_x_frames(x: u32) {
-    let start = Instant::now();
-
-    for _ in 0..x {
-        wrapper::run_frame();
-    }
-
-    let elapsed = start.elapsed();
-
-    println!("Duration of {} frames: {:?}ms", x, elapsed.as_millis());
-}
-
 pub static PATH: &str = "./game/lsdj4.5.1_TBC.gb";
 
 #[derive(Debug, Default)]
@@ -32,7 +19,30 @@ pub struct SameBoyEmulator {
     game_path: Option<String>,
     save_path: Option<String>,
     instant: Option<std::time::Instant>,
-    frames: usize
+    frames: usize,
+    paused: bool
+}
+
+impl SameBoyEmulator {
+    fn load_game(&mut self, game: Box<dyn Game>) {
+        self.game_path = Some(game.path().unwrap()
+            .to_str().unwrap()
+            .to_owned());
+        
+        let game_info = wrapper::GameInfo {
+            path: self.game_path.as_ref().unwrap().clone()
+        };
+
+        wrapper::load_game(&game_info);
+    }
+
+    fn load_save(&mut self, save: Box<dyn game::Save>) {
+        self.save_path = Some(save.path().unwrap()
+            .to_str().unwrap()
+            .to_owned());
+
+        wrapper::load_save(self.save_path.as_ref().unwrap())
+    }
 }
 
 
@@ -48,24 +58,15 @@ impl super::Emulator for SameBoyEmulator {
         wrapper::init();
     }
 
-    fn load_game(&mut self, game_path: String) {
-        self.save_path = Some(format!("{}.sav", &game_path));
-        self.game_path = Some(game_path);
-        
-        let game_info = wrapper::GameInfo {
-            path: self.game_path.as_ref().unwrap().clone()
-        };
-
-        wrapper::load_game(&game_info);
-        wrapper::load_save(&self.save_path.as_ref().unwrap());
-    }
 
     fn handle_command(&mut self, command: super::EmulatorCommand) -> bool {
         use EmulatorCommand::*;
         
         match command {
             RunFrame => {
-                wrapper::run_frame();
+                if !self.paused {
+                    wrapper::run_frame();
+                }
                 self.frames = self.frames + 1;
                 if self.frames % 60 == 0 {
                     let elapsed = self.instant.unwrap().elapsed().as_millis();
@@ -77,7 +78,11 @@ impl super::Emulator for SameBoyEmulator {
                let sb_input = wrapper::SameboyJoypadInput::from(input);
                input::store_input(sb_input);
             }
-            Stop => return false
+            Stop => return false,
+            LoadGame(game) => self.load_game(game),
+            LoadSave(save) => self.load_save(save),
+            Pause => self.paused = true,
+            Resume => self.paused = false,
         };
 
         true
@@ -88,5 +93,6 @@ impl super::Emulator for SameBoyEmulator {
         wrapper::unload_game();
         wrapper::deinit();
     }
+
 }
 
