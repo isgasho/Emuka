@@ -71,6 +71,21 @@ pub enum SameboyJoypadInput {
     RIGHT = bindings::RETRO_DEVICE_ID_JOYPAD_RIGHT,
 }
 
+impl From<crate::emulators::EmulatorJoypadInput> for SameboyJoypadInput {
+    fn from(input: crate::emulators::EmulatorJoypadInput) -> Self {
+        match input {
+            crate::emulators::EmulatorJoypadInput::A => Self::A,
+            crate::emulators::EmulatorJoypadInput::B => Self::B,
+            crate::emulators::EmulatorJoypadInput::SELECT => Self::SELECT,
+            crate::emulators::EmulatorJoypadInput::START => Self::START,
+            crate::emulators::EmulatorJoypadInput::UP => Self::UP,
+            crate::emulators::EmulatorJoypadInput::DOWN => Self::DOWN,
+            crate::emulators::EmulatorJoypadInput::RIGHT => Self::RIGHT,
+            crate::emulators::EmulatorJoypadInput::LEFT => Self::LEFT
+        }
+    }
+}
+
 pub type EnvironmentCallback = fn(cmd: &EnvironmentCallbackCmd, data: &mut EnvironmentCallbackData) -> bool;
 pub type InputPollCallback = fn();
 pub type InputStateCallback = fn() -> i16;

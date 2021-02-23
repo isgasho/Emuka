@@ -1,11 +1,10 @@
 use color_eyre::eyre::Result;
-use emuka::emulators::sameboy::init;
 
-
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     color_eyre::install()?;
 
-    init();
+    emuka::init().await;
     
     return Ok(());
 }

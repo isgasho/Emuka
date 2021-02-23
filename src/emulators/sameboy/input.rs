@@ -2,9 +2,7 @@ use std::sync::atomic::{AtomicI16, Ordering};
 
 use super::wrapper::*;
 
-pub fn input_poll() {
-    // println!("Input polled");
-}
+pub fn input_poll() {}
 
 static INPUT_STATE: AtomicI16 = AtomicI16::new(0);
 
