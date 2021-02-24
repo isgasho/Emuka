@@ -467,11 +467,13 @@ pub fn set_video_refresh_cb() {
 pub fn get_screen_data() -> Option<Vec<u8>> {
     match SCREEN_DATA.lock() {
         Ok(screen_data) => {
+            if screen_data.is_empty() {
+                return None;
+            }
+
             let mut bytes = Vec::<u8>::with_capacity(screen_data.len() * std::mem::size_of::<u32>());
             for word in screen_data.iter() {
-                for byte in word.to_le_bytes().iter() {
-                    bytes.push(byte.clone())
-                }
+                bytes.extend_from_slice(&word.to_le_bytes());
             }
             
             Some(bytes)

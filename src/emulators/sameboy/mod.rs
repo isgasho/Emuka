@@ -70,9 +70,6 @@ impl super::Emulator for SameBoyEmulator {
             RunFrame => {
                 if self.running {
                     wrapper::run_frame();
-                    if self.frames % 5 == 0 {
-                        // wrapper::get_screen_data();
-                    }
                 }
                 self.frames = self.frames + 1;
                 // if self.frames % 60 == 0 {
@@ -81,6 +78,7 @@ impl super::Emulator for SameBoyEmulator {
                 //     self.instant = Some(Instant::now());
                 // }
             },
+            GetScreenData(sender) => sender.send(wrapper::get_screen_data()).unwrap(),
             Input(input) => {
                let sb_input = wrapper::SameboyJoypadInput::from(input);
                input::store_input(sb_input);

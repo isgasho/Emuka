@@ -3,6 +3,7 @@ pub mod sameboy;
 use std::{path::PathBuf};
 
 use tokio::{sync::mpsc::{UnboundedSender, unbounded_channel}, time};
+use tokio::sync::oneshot::Sender;
 
 use crate::game::{Game, GameFromFile, Save, SaveFile};
 
@@ -19,6 +20,7 @@ pub enum EmulatorCommand {
     LoadGame(Box<dyn Game>),
     LoadSave(Box<dyn Save>),
     RunFrame,
+    GetScreenData(Sender<Option<Vec<u8>>>),
     Pause,
     Resume,
     Input(EmulatorJoypadInput),

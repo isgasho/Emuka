@@ -1,6 +1,7 @@
 use std::{convert::TryInto, process::Command};
 
 use color_eyre::Report;
+use tokio::sync::oneshot;
 use warp::{Filter, Rejection, Reply, filters::BoxedFilter, reply::json};
 
 use crate::{emulators::{EmulatorCommand, EmulatorJoypadInput}, game::{self, Game, GameFromFile, SaveFile}};
@@ -63,7 +64,20 @@ impl Into<EmulatorJoypadInput> for EmulatorJoypadInputApi {
     }
 }
 
+#[derive(Debug, Serialize, Clone)]
+struct ScreenDataApi {
+    screen: Option<String>
+}
 
+impl From<Option<Vec<u8>>> for ScreenDataApi {
+    fn from(data: Option<Vec<u8>>) -> Self {
+        Self {
+            screen: data.map(
+                |bytes| base64::encode(bytes)
+            )
+        }
+    }
+}
 
 async fn load_game(
     game_api: GameFromFileApi,
@@ -120,6 +134,15 @@ async fn input(
     Ok(warp::reply())
 }
 
+async fn get_screen_data(
+    sender: CommandSender
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let (os_sender, os_receiver) = oneshot::channel::<Option<Vec<u8>>>();
+    sender.send_command(EmulatorCommand::GetScreenData(os_sender));
+    let value = os_receiver.await.unwrap();
+    let data = ScreenDataApi::from(value);
+    Ok(warp::reply::json(&data))
+}
 
 
 pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
@@ -155,10 +178,17 @@ pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
         .and(command_filter.clone())
         .and_then(input);
 
+    let get_screen_data_f = warp::get()
+        .and(warp::path("screen"))
+        .and(warp::path::end())
+        .and(command_filter.clone())
+        .and_then(get_screen_data);
+
     load_game_f
     .or(load_save_f)
     .or(resume_f)
     .or(input_f)
+    .or(get_screen_data_f)
     .boxed()
 }
 
