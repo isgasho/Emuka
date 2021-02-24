@@ -473,7 +473,9 @@ pub fn get_screen_data() -> Option<Vec<u8>> {
 
             let mut bytes = Vec::<u8>::with_capacity(screen_data.len() * std::mem::size_of::<u32>());
             for word in screen_data.iter() {
-                bytes.extend_from_slice(&word.to_le_bytes());
+                let new_byte = word << 8 | 0xFF;
+                let le_bytes = new_byte.to_be_bytes();
+                bytes.extend_from_slice(&le_bytes);
             }
             
             Some(bytes)

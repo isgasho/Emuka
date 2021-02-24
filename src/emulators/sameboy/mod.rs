@@ -79,9 +79,9 @@ impl super::Emulator for SameBoyEmulator {
                 // }
             },
             GetScreenData(sender) => sender.send(wrapper::get_screen_data()).unwrap(),
-            Input(input) => {
+            Input((input, pressed)) => {
                let sb_input = wrapper::SameboyJoypadInput::from(input);
-               input::store_input(sb_input);
+               input::store_input(sb_input, pressed);
             }
             Stop => return false,
             LoadGame(game) => self.load_game(game),

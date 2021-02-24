@@ -55,12 +55,13 @@ impl TryInto<SaveFile> for SaveFromFileApi {
 
 #[derive(Debug, Deserialize, Clone)]
 struct EmulatorJoypadInputApi {
-    input: EmulatorJoypadInput
+    input: EmulatorJoypadInput,
+    pressed: bool
 }
 
-impl Into<EmulatorJoypadInput> for EmulatorJoypadInputApi {
-    fn into(self) -> EmulatorJoypadInput {
-        self.input
+impl Into<(EmulatorJoypadInput, bool)> for EmulatorJoypadInputApi {
+    fn into(self) -> (EmulatorJoypadInput, bool) {
+        (self.input, self.pressed)
     }
 }
 
@@ -129,7 +130,7 @@ async fn input(
     input_api: EmulatorJoypadInputApi,
     sender: CommandSender
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let input: EmulatorJoypadInput = input_api.into();
+    let input: (EmulatorJoypadInput, bool) = input_api.into();
     sender.send_command(EmulatorCommand::Input(input));
     Ok(warp::reply())
 }
@@ -184,11 +185,16 @@ pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
         .and(command_filter.clone())
         .and_then(get_screen_data);
 
+    let a_f = warp::post()
+        .and(warp::path("a"))
+        .and_then(answer_a);
+
     load_game_f
     .or(load_save_f)
     .or(resume_f)
     .or(input_f)
     .or(get_screen_data_f)
+    .or(a_f)
     .boxed()
 }
 

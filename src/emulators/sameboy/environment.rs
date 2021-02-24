@@ -47,7 +47,7 @@ fn get_system_directory(data: &mut EnvironmentCallbackData) -> bool {
 fn set_pixel_format(data: &mut EnvironmentCallbackData) -> bool {
     match data {
         EnvironmentCallbackData::IntWrapper(wrapper) => {
-            wrapper.inner = retro_pixel_format::RETRO_PIXEL_FORMAT_0RGB1555 as u32;
+            wrapper.inner = retro_pixel_format::RETRO_PIXEL_FORMAT_XRGB8888 as u32;
             return true;
         },
         _ => return false

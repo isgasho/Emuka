@@ -23,7 +23,7 @@ pub enum EmulatorCommand {
     GetScreenData(Sender<Option<Vec<u8>>>),
     Pause,
     Resume,
-    Input(EmulatorJoypadInput),
+    Input((EmulatorJoypadInput, bool)),
     Stop,
 }
 

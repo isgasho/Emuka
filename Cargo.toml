@@ -17,6 +17,8 @@ warp = "0.3"
 serde = "1"
 serde_derive = "1"
 base64 = "0.13"
+log = "0.4"
+env_logger = "*"
 
 [build-dependencies]
 bindgen = "0.57"

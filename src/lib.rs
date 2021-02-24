@@ -4,6 +4,9 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
+extern crate env_logger;
+#[macro_use] extern crate log;
+
 use std::{path::PathBuf};
 
 use emulators::{Emulator, EmulatorCommand};
