@@ -1,5 +1,7 @@
 use std::time::Instant;
 
+use warp::ext::get;
+
 use crate::game::{self, Game};
 
 use super::EmulatorCommand;
@@ -56,7 +58,7 @@ impl super::Emulator for SameBoyEmulator {
         wrapper::set_input_poll_cb(input::input_poll);
         wrapper::set_input_state_cb(input::input_state);
         wrapper::set_audio_sample_cb(audio::audio_sample);
-        wrapper::set_video_refresh_cb(video::video_refresh);
+        wrapper::set_video_refresh_cb();
         wrapper::init();
     }
 
@@ -68,8 +70,11 @@ impl super::Emulator for SameBoyEmulator {
             RunFrame => {
                 if self.running {
                     wrapper::run_frame();
+                    if self.frames % 5 == 0 {
+                        // wrapper::get_screen_data();
+                    }
                 }
-                // self.frames = self.frames + 1;
+                self.frames = self.frames + 1;
                 // if self.frames % 60 == 0 {
                 //     let elapsed = self.instant.unwrap().elapsed().as_millis();
                 //     println!("Ran 60 frames in {}ms", elapsed);

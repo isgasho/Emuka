@@ -43,7 +43,6 @@ pub async fn init() -> UnboundedSender<EmulatorCommand> {
 
     let (sender, mut receiver) = unbounded_channel::<EmulatorCommand>();
     let sender_interval = sender.clone();
-    let sender_command = sender.clone();
 
     let mut interval = time::interval(time::Duration::from_nanos(1_000_000_000 / 60));
 
@@ -54,12 +53,6 @@ pub async fn init() -> UnboundedSender<EmulatorCommand> {
             sender_interval.send(EmulatorCommand::RunFrame).unwrap();
         }
     });
-
-    tokio::spawn(async move {
-        time::sleep(time::Duration::from_secs(5)).await;
-        sender_command.send(EmulatorCommand::Input(EmulatorJoypadInput::START)).unwrap();
-    });
-
     
     tokio::spawn( async move {
         loop {

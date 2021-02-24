@@ -1,4 +1,4 @@
-use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::{self, Path}, sync::RwLock};
+use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, mem, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::{self, Path}, sync::{Mutex, RwLock, atomic::{AtomicPtr, AtomicU32, Ordering}}};
 use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, RETRO_ENVIRONMENT_EXPERIMENTAL, RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, emuka_save_battery, emuka_set_audio_frequency, retro_set_input_poll};
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
@@ -216,6 +216,9 @@ impl IntWrapper {
     }
 }
 
+
+
+
 unsafe fn environ_cb_call(cb: EnvironmentCallback, cmd: u32, data: *mut c_void) -> bool {
     let env_cb_cmd = EnvironmentCallbackCmd::try_from(cmd);
     
@@ -428,52 +431,61 @@ pub fn set_audio_sample_cb(cb: AudioSampleCallback) {
     }
 }
 
-unsafe fn video_refresh_call(cb: VideoRefreshCallback, data: *const c_void, width: c_uint, height: c_uint, pitch: size_t) {
-    if data.is_null() {
-        println!("Null pointer on video refresh");
-        return;
-    }
 
-    let data: &[u32] = std::slice::from_raw_parts(data.cast(), (width * height) as usize); 
-
-    let cb_result = catch_unwind(|| cb(data, width, height, pitch));
-
-    match cb_result {
-        Ok(result) => result,
-        Err(err) => {
-            println!("{:?}", err);
-        }
-    }
+struct ScreenData {
+    pub ptr: AtomicPtr<u32>,
+    pub width: u32,
+    pub height: u32 
 }
 
-unsafe extern "C" fn video_refresh_cb(data: *const c_void, width: c_uint, height: c_uint, pitch: size_t) {
-    let cb_lock_result = VIDEO_REFRESH_CALLBACK_GLOBAL.read();
-    match cb_lock_result {
-        Err(_) => (),
-        Ok(cb_lock) => {
-            match *cb_lock {
-                None => (),
-                Some(cb) => {
-                    video_refresh_call(cb, data, width, height, pitch)
-                }
+lazy_static!{
+    static ref SCREEN_DATA: Mutex<Vec<u32>> = Mutex::new(Vec::new());
+}
+
+
+unsafe extern "C" fn video_refresh_cb(data: *const c_void, width: c_uint, height: c_uint, _pitch: size_t) {
+    match SCREEN_DATA.lock() {
+        Ok(mut lock) => {
+            if !data.is_null() {
+                let slc: &[u32] = std::slice::from_raw_parts(data.cast(), (width * height) as usize);
+                *lock = Vec::from(slc);
             }
         }
+        Err(err) => {
+            eprintln!("{}", err)
+        }
     }
 }
 
 
-pub fn set_video_refresh_cb(cb: VideoRefreshCallback) {
-    {
-        let mut lock = VIDEO_REFRESH_CALLBACK_GLOBAL.write().unwrap();
-        *lock = Some(cb);
-    }
-
+pub fn set_video_refresh_cb() {
     unsafe {
         bindings::retro_set_video_refresh(Some(video_refresh_cb));
     }
 }
 
+pub fn get_screen_data() -> Option<Vec<u8>> {
+    match SCREEN_DATA.lock() {
+        Ok(screen_data) => {
+            let mut bytes = Vec::<u8>::with_capacity(screen_data.len() * std::mem::size_of::<u32>());
+            for word in screen_data.iter() {
+                for byte in word.to_le_bytes().iter() {
+                    bytes.push(byte.clone())
+                }
+            }
+            
+            Some(bytes)
+        }
+        Err(err) => {
+            eprintln!("{}", err);
+            None
+        }
+    }
+}
+
 pub fn unload_game() {
+    // TODO: implement unload screen data
+
     unsafe {
         bindings::retro_unload_game();
     }
