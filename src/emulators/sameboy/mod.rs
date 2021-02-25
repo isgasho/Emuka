@@ -40,12 +40,22 @@ impl SameBoyEmulator {
     }
 
     fn load_save(&mut self, save: Box<dyn game::Save>) {
-        self.save_path = Some(save.path().unwrap()
-            .to_str().unwrap()
-            .to_owned());
+        if save.can_write() {
+            self.save_path = Some(save.path().unwrap()
+                .to_str().unwrap()
+                .to_owned());
+            
+            wrapper::load_save(self.save_path.as_ref().unwrap());
+            println!("Save loaded");
+        } else {
+            println!("Read only save, unimplemented for now")
+        }
+    }
 
-        wrapper::load_save(self.save_path.as_ref().unwrap());
-        println!("Save loaded");
+    fn save(&self) {
+        if let Some(save_path) = self.save_path.as_ref() {
+            wrapper::save(&save_path);
+        }
     }
 }
 
@@ -83,6 +93,7 @@ impl super::Emulator for SameBoyEmulator {
                let sb_input = wrapper::SameboyJoypadInput::from(input);
                input::store_input(sb_input, pressed);
             }
+            Save => self.save(),
             Stop => return false,
             LoadGame(game) => self.load_game(game),
             LoadSave(save) => self.load_save(save),

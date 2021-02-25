@@ -20,6 +20,7 @@ pub enum EmulatorCommand {
     LoadGame(Box<dyn Game>),
     LoadSave(Box<dyn Save>),
     RunFrame,
+    Save,
     GetScreenData(Sender<Option<Vec<u8>>>),
     Pause,
     Resume,

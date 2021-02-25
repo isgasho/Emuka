@@ -145,13 +145,20 @@ async fn get_screen_data(
     Ok(warp::reply::json(&data))
 }
 
+async fn save(
+    sender: CommandSender
+) -> Result<impl warp::Reply, warp::Rejection> {
+    sender.send_command(EmulatorCommand::Save);
+    Ok(warp::reply())
+}
+
 
 pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
     let command_filter = warp::any().map(move || sender.clone());
     
     let load_game_f = warp::post()
-        .and(warp::path("load"))
         .and(warp::path("game"))
+        .and(warp::path("load"))
         .and(warp::path::end())
         .and(post_json::<GameFromFileApi>())
         .and(command_filter.clone())
@@ -159,8 +166,8 @@ pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
     
 
     let load_save_f = warp::post()
-        .and(warp::path("load"))
         .and(warp::path("save"))
+        .and(warp::path("load"))
         .and(warp::path::end())
         .and(post_json::<SaveFromFileApi>())
         .and(command_filter.clone())
@@ -185,16 +192,19 @@ pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
         .and(command_filter.clone())
         .and_then(get_screen_data);
 
-    let a_f = warp::post()
-        .and(warp::path("a"))
-        .and_then(answer_a);
+    let safe_f = warp::get()
+        .and(warp::path("save"))
+        .and(warp::path("save"))
+        .and(warp::path::end())
+        .and(command_filter.clone())
+        .and_then(save);
 
     load_game_f
     .or(load_save_f)
     .or(resume_f)
     .or(input_f)
     .or(get_screen_data_f)
-    .or(a_f)
+    .or(safe_f)
     .boxed()
 }
 
