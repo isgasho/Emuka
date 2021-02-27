@@ -1,5 +1,4 @@
-use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, mem, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::{self, Path}, sync::{Mutex, RwLock, atomic::{AtomicPtr, AtomicU32, Ordering}}};
-use bindings::{RETRO_DEVICE_ID_JOYPAD_A, RETRO_DEVICE_ID_JOYPAD_B, RETRO_DEVICE_ID_JOYPAD_START, RETRO_ENVIRONMENT_EXPERIMENTAL, RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, emuka_save_battery, emuka_set_audio_frequency, retro_set_input_poll};
+use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::Path, sync::{Mutex, RwLock, atomic::AtomicPtr}};
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
 use eyre::*;
@@ -257,7 +256,7 @@ unsafe fn environ_cb_call(cb: EnvironmentCallback, cmd: u32, data: *mut c_void) 
                 }
             }
         },
-        Err(err) => {
+        Err(_err) => {
             // println!("{:?}", err);
             false
         }
@@ -526,5 +525,11 @@ pub fn save <P: AsRef<Path>> (path: P) {
 pub fn set_audio_frequency(frequency: u32) {
     unsafe {
         bindings::emuka_set_audio_frequency(frequency);
+    }
+}
+
+pub fn read_memory() -> bool {
+    unsafe {
+        bindings::emuka_read_remory()
     }
 }

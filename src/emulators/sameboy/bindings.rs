@@ -3681,3 +3681,6 @@ extern "C" {
 extern "C" {
     pub fn emuka_set_audio_frequency(frequency: ::std::os::raw::c_uint);
 }
+extern "C" {
+    pub fn emuka_read_remory() -> bool;
+}

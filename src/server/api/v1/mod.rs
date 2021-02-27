@@ -1,21 +1,12 @@
-use std::{convert::TryInto, process::Command};
+use std::convert::TryInto;
 
 use color_eyre::Report;
 use tokio::sync::oneshot;
-use warp::{Filter, Rejection, Reply, filters::BoxedFilter, reply::json};
+use warp::{Filter, Reply, filters::BoxedFilter};
 
-use crate::{emulators::{EmulatorCommand, EmulatorJoypadInput}, game::{self, Game, GameFromFile, SaveFile}};
+use crate::{emulators::{EmulatorCommand, EmulatorJoypadInput}, game::{GameFromFile, SaveFile}};
 
 use super::{CommandSender};
-
-async fn answer_a() -> Result<impl Reply, Rejection> {
-    Ok(json(&String::from("A")))
-}
-
-
-async fn answer_b() -> Result<impl Reply, Rejection> {
-    Ok(json(&String::from("B")))
-}
 
 
 #[derive(Debug, Deserialize, Clone)]
