@@ -18,7 +18,7 @@ fn build_sameboy() {
     println!("cargo:rerun-if-changed={}{}", SAMEBOY_PATH, SAMEBOY_SOURCE_PATH);
     println!("cargo:rustc-link-lib=static=sameboy");
 
-    set_current_dir(SAMEBOY_PATH).unwrap();
+    set_current_dir(format!("../{}", SAMEBOY_PATH)).unwrap();
 
     let output = if cfg!(target_os = "windows") {
         Command::new("cmd")
@@ -54,10 +54,12 @@ fn build_sameboy() {
 
     set_current_dir("../..").unwrap();
 
+    println!("{:?}", std::env::current_dir());
+
     copy(format!("{}./build/bin/sameboy_libretro.a", SAMEBOY_PATH), "./lib/libsameboy.a").unwrap();
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(String::from("./src/emulators/sameboy"));
+    let out_path = PathBuf::from(String::from("./emuka-server/src/emulators/sameboy"));
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
