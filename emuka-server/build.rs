@@ -14,8 +14,8 @@ fn main() {
 }
 
 fn build_sameboy() {
-    println!("cargo:rerun-if-changed={}{}", SAMEBOY_PATH, SAMEBOY_HEADER_PATH);
-    println!("cargo:rerun-if-changed={}{}", SAMEBOY_PATH, SAMEBOY_SOURCE_PATH);
+    println!("cargo:rerun-if-changed=../{}{}", SAMEBOY_PATH, SAMEBOY_HEADER_PATH);
+    println!("cargo:rerun-if-changed=../{}{}", SAMEBOY_PATH, SAMEBOY_SOURCE_PATH);
     println!("cargo:rustc-link-lib=static=sameboy");
 
     set_current_dir(format!("../{}", SAMEBOY_PATH)).unwrap();
