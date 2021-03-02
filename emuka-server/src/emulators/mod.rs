@@ -21,7 +21,7 @@ pub enum EmulatorCommand {
     LoadSave(Box<dyn Save>),
     RunFrame,
     Save,
-    GetScreenData(Sender<Option<Vec<u8>>>),
+    GetScreenData(Sender<Option<ScreenData>>),
     Pause,
     Resume,
     Input((EmulatorJoypadInput, bool)),
@@ -38,6 +38,12 @@ pub enum EmulatorJoypadInput {
     DOWN,
     RIGHT,
     LEFT
+}
+#[derive(Debug, Deserialize, Clone)]
+pub struct ScreenData {
+    pub data: Vec<u8>,
+    pub width: u32,
+    pub height: u32
 }
 
 

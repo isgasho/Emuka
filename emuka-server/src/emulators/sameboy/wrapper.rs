@@ -2,6 +2,8 @@ use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
 use eyre::*;
+use crate::emulators::ScreenData;
+
 use super::bindings::{self, size_t};
 
 #[repr(u32)]
@@ -431,14 +433,18 @@ pub fn set_audio_sample_cb(cb: AudioSampleCallback) {
 }
 
 
-struct ScreenData {
-    pub ptr: AtomicPtr<u32>,
+struct SameboyScreenData {
+    pub data: Vec<u32>,
     pub width: u32,
-    pub height: u32 
+    pub height: u32
 }
 
 lazy_static!{
-    static ref SCREEN_DATA: Mutex<Vec<u32>> = Mutex::new(Vec::new());
+    static ref SCREEN_DATA: Mutex<SameboyScreenData> = Mutex::new(SameboyScreenData {
+        data: Vec::new(),
+        width: 0,
+        height: 0
+    });
 }
 
 
@@ -446,8 +452,10 @@ unsafe extern "C" fn video_refresh_cb(data: *const c_void, width: c_uint, height
     match SCREEN_DATA.lock() {
         Ok(mut lock) => {
             if !data.is_null() {
+                (*lock).height = height;
+                (*lock).width = width;
                 let slc: &[u32] = std::slice::from_raw_parts(data.cast(), (width * height) as usize);
-                *lock = Vec::from(slc);
+                (*lock).data = Vec::from(slc);
             }
         }
         Err(err) => {
@@ -463,21 +471,25 @@ pub fn set_video_refresh_cb() {
     }
 }
 
-pub fn get_screen_data() -> Option<Vec<u8>> {
+pub fn get_screen_data() -> Option<ScreenData> {
     match SCREEN_DATA.lock() {
         Ok(screen_data) => {
-            if screen_data.is_empty() {
+            if screen_data.data.is_empty() {
                 return None;
             }
 
-            let mut bytes = Vec::<u8>::with_capacity(screen_data.len() * std::mem::size_of::<u32>());
-            for word in screen_data.iter() {
+            let mut bytes = Vec::<u8>::with_capacity(screen_data.data.len() * std::mem::size_of::<u32>());
+            for word in screen_data.data.iter() {
                 let new_byte = word << 8 | 0xFF;
                 let le_bytes = new_byte.to_be_bytes();
                 bytes.extend_from_slice(&le_bytes);
             }
             
-            Some(bytes)
+            Some(ScreenData {
+                data: bytes,
+                width: screen_data.width,
+                height: screen_data.height
+            })
         }
         Err(err) => {
             eprintln!("{}", err);

@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use uuid::Uuid;
 use warp::Filter;
 
-use crate::{emulators::EmulatorJoypadInput, game::{GameFromFile, SaveFile}};
+use crate::{emulators::{EmulatorJoypadInput, ScreenData}, game::{GameFromFile, SaveFile}};
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct GameFromFileApi {
@@ -54,15 +54,24 @@ impl Into<(EmulatorJoypadInput, bool)> for EmulatorJoypadInputApi {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct ScreenDataApi {
-    pub screen: Option<String>
+    pub screen: Option<String>,
+    pub width: u32,
+    pub height: u32
 }
 
-impl From<Option<Vec<u8>>> for ScreenDataApi {
-    fn from(data: Option<Vec<u8>>) -> Self {
-        Self {
-            screen: data.map(
-                |bytes| base64::encode(bytes)
-            )
+impl From<Option<ScreenData>> for ScreenDataApi {
+    fn from(data: Option<ScreenData>) -> Self {
+        match data {
+            Some(screen_data) => Self {
+                width: screen_data.width,
+                height: screen_data.height,
+                screen: Some(base64::encode(screen_data.data))
+            },
+            None => Self {
+                screen: None,
+                width: 0,
+                height: 0
+            }
         }
     }
 }

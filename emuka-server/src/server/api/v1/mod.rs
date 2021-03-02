@@ -1,5 +1,5 @@
 pub mod api;
-use crate::{audio::VecStereoWrapper, server::api::v1::api::*};
+use crate::{audio::VecStereoWrapper, emulators::ScreenData, server::api::v1::api::*};
 
 use std::{collections::VecDeque, convert::TryInto};
 
@@ -72,7 +72,7 @@ async fn input(
 async fn get_screen_data(
     sender: CommandSender
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    let (os_sender, os_receiver) = oneshot::channel::<Option<Vec<u8>>>();
+    let (os_sender, os_receiver) = oneshot::channel::<Option<ScreenData>>();
     sender.send_command(EmulatorCommand::GetScreenData(os_sender));
     let value = os_receiver.await.unwrap();
     let data = ScreenDataApi::from(value);
