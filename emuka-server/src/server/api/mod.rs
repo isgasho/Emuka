@@ -5,7 +5,7 @@ use warp::{Filter, Reply, filters::BoxedFilter};
 
 use crate::emulators::EmulatorCommand;
 
-mod v1;
+pub mod v1;
 
 #[derive(Clone)]
 pub struct CommandSender {

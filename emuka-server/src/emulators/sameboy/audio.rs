@@ -1,6 +1,12 @@
-use crate::audio::{SAMPLES, StereoSample};
+use crate::audio::StereoSample;
+use crate::audio::SAMPLES_MAP;
 
 pub fn audio_sample(left: i16, right: i16) {
-    let mut lock = SAMPLES.lock().unwrap();
-    (*lock).push_back (StereoSample {left, right});
+    let mut lock = SAMPLES_MAP.lock().unwrap();
+    let map = &mut *lock;
+
+    for (_, queue) in map.iter_mut() {
+        queue.push_back (StereoSample {left, right});
+    }
 }
+

@@ -1,5 +1,5 @@
 [package]
-name = "emuka_server"
+name = "emuka-server"
 version = "0.1.0"
 authors = ["ShinySaana <shinysaana@gmail.com>"]
 edition = "2018"
@@ -17,6 +17,7 @@ serde_derive = "1"
 base64 = "0.13"
 log = "0.4"
 env_logger = "*"
+uuid = { version = "0.8", features = ["serde", "v4" ]}
 
 [build-dependencies]
 bindgen = "0.57"

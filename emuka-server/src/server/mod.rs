@@ -1,4 +1,4 @@
-mod api;
+pub mod api;
 
 use tokio::sync::mpsc::UnboundedSender;
 use crate::emulators::EmulatorCommand;

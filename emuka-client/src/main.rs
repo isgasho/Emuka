@@ -1,5 +1,13 @@
-fn main() {
-    println!("Hello, world!");
+use color_eyre::eyre::Result;
 
-    println!("{}", emuka_server::audio::SAMPLE_RATE);
+use emuka_client::init;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    color_eyre::install()?;
+
+    init().await?;
+    
+    return Ok(());
 }
+

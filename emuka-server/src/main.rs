@@ -1,10 +1,9 @@
 use color_eyre::eyre::Result;
-
 #[tokio::main]
 async fn main() -> Result<()> {
     color_eyre::install()?;
 
-    let _stream = emuka_server::audio::init_audio(); 
+    let _stream = emuka_server::audio::init_audio_stream();
     let sender = emuka_server::emulators::init().await;
     emuka_server::server::init(sender).await;
     

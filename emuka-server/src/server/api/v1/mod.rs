@@ -1,75 +1,18 @@
-use std::convert::TryInto;
+pub mod api;
+use crate::{audio::VecStereoWrapper, server::api::v1::api::*};
+
+use std::{collections::VecDeque, convert::TryInto};
 
 use color_eyre::Report;
 use tokio::sync::oneshot;
 use warp::{Filter, Reply, filters::BoxedFilter};
+use uuid::Uuid;
 
-use crate::{emulators::{EmulatorCommand, EmulatorJoypadInput}, game::{GameFromFile, SaveFile}};
+use crate::{audio::{SAMPLE_RATE, StereoSample}, emulators::{EmulatorCommand, EmulatorJoypadInput}, game::{GameFromFile, SaveFile}};
+use crate::audio::SAMPLES_MAP;
+
 
 use super::{CommandSender};
-
-
-#[derive(Debug, Deserialize, Clone)]
-struct GameFromFileApi {
-    path: String
-}
-
-
-impl TryInto<GameFromFile> for GameFromFileApi {
-    type Error = eyre::Report;
-
-    fn try_into(self) -> Result<GameFromFile, Self::Error> {
-        Ok(GameFromFile::new(&self.path, &self.path)?)
-    }
-}
-
-fn post_json <T: Send + Sync + serde::de::DeserializeOwned> () -> impl Filter<Extract = (T,), Error = warp::Rejection> + Clone {
-    // When accepting a body, we want a JSON body
-    // (and to reject huge payloads)...
-    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
-}
-
-
-#[derive(Debug, Deserialize, Clone)]
-struct SaveFromFileApi {
-    path: String
-}
-
-
-impl TryInto<SaveFile> for SaveFromFileApi {
-    type Error = eyre::Report;
-
-    fn try_into(self) -> Result<SaveFile, Self::Error> {
-        Ok(SaveFile::new(&self.path, &self.path)?)
-    }
-}
-
-#[derive(Debug, Deserialize, Clone)]
-struct EmulatorJoypadInputApi {
-    input: EmulatorJoypadInput,
-    pressed: bool
-}
-
-impl Into<(EmulatorJoypadInput, bool)> for EmulatorJoypadInputApi {
-    fn into(self) -> (EmulatorJoypadInput, bool) {
-        (self.input, self.pressed)
-    }
-}
-
-#[derive(Debug, Serialize, Clone)]
-struct ScreenDataApi {
-    screen: Option<String>
-}
-
-impl From<Option<Vec<u8>>> for ScreenDataApi {
-    fn from(data: Option<Vec<u8>>) -> Self {
-        Self {
-            screen: data.map(
-                |bytes| base64::encode(bytes)
-            )
-        }
-    }
-}
 
 async fn load_game(
     game_api: GameFromFileApi,
@@ -143,6 +86,52 @@ async fn save(
     Ok(warp::reply())
 }
 
+async fn register_audio_queue() -> Result<impl warp::Reply, warp::Rejection> {
+    let id = Uuid::new_v4();
+    
+    {
+        let mut lock = SAMPLES_MAP.lock().unwrap();
+        let map = &mut *lock;
+        map.insert(id, VecDeque::with_capacity((SAMPLE_RATE * 20) as usize));
+    }
+
+    let audio_register = AudioRegisterApi {id};
+
+    Ok(warp::reply::json(&audio_register))
+}
+
+async fn get_audio_samples (
+    request: Uuid
+) -> Result<impl warp::Reply, warp::Rejection> {
+    let data = {
+        let mut lock = SAMPLES_MAP.lock().unwrap();
+        let map = &mut *lock;
+        let queue = map.get_mut(&request);
+        queue.map(|q| q.drain(..).collect::<Vec<StereoSample>>())
+    };
+
+    match data {
+        Some(samples) => {
+            let wrapper = VecStereoWrapper {
+                inner: Some(samples)
+            };
+            let encoded: String = wrapper.into();
+            let res = GetAudioSamplesResponseApi {
+                data: Some(encoded)
+            };
+        
+            Ok(warp::reply::json(&res))
+        }
+        None => {
+            let res = GetAudioSamplesResponseApi {
+                data: None
+            };
+        
+            Ok(warp::reply::json(&res))
+        }
+    }
+}
+
 
 pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
     let command_filter = warp::any().map(move || sender.clone());
@@ -190,12 +179,27 @@ pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
         .and(command_filter.clone())
         .and_then(save);
 
+    let register_audio_queue_f = warp::get()
+        .and(warp::path("audio"))
+        .and(warp::path("register"))
+        .and(warp::path::end())
+        .and_then(register_audio_queue);
+
+    let get_audio_samples_f = warp::get()
+        .and(warp::path("audio"))
+        .and(warp::path("get"))
+        .and(warp::path::param().map(|id: Uuid| id))
+        .and(warp::path::end())
+        .and_then(get_audio_samples);
+
     load_game_f
     .or(load_save_f)
     .or(resume_f)
     .or(input_f)
     .or(get_screen_data_f)
     .or(safe_f)
+    .or(register_audio_queue_f)
+    .or(get_audio_samples_f)
     .boxed()
 }
 
