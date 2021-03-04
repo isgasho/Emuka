@@ -20,17 +20,18 @@ fn build_sameboy() {
 
     set_current_dir(format!("../{}", SAMEBOY_PATH)).unwrap();
 
-    let output = if cfg!(target_os = "windows") {
-        Command::new("cmd")
-                .args(&["/C", "make CC=clang libretro"])
-                .output()
-                .expect("failed to execute process")
+    let output = if std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap() == "windows" {
+        Command::new("sh")
+            .arg("-c")
+            .arg("make PLATFORM=MINGW64 CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar -C libretro")
+            .output()
+            .expect("failed to execute process")
     } else {
         Command::new("sh")
-                .arg("-c")
-                .arg("make CC=clang libretro")
-                .output()
-                .expect("failed to execute process")
+            .arg("-c")
+            .arg("make CC=clang libretro")
+            .output()
+            .expect("failed to execute process")
     };
 
     println!("{}{}", String::from_utf8(output.stdout).unwrap(), String::from_utf8(output.stderr).unwrap());
