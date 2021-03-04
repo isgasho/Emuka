@@ -1,5 +1,5 @@
 use super::wrapper::*;
-use super::bindings::*;
+use super::bindings::bindings::*;
 
 pub fn environment_callback(cmd: &EnvironmentCallbackCmd, data: &mut EnvironmentCallbackData) -> bool {
     use EnvironmentCallbackCmd::*;

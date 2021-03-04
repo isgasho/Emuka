@@ -4,7 +4,7 @@ use num_enum::TryFromPrimitive;
 use eyre::*;
 use crate::emulators::ScreenData;
 
-use super::bindings::{self, size_t};
+use super::bindings::bindings::{self, size_t};
 
 #[repr(u32)]
 #[derive(TryFromPrimitive, Debug)]

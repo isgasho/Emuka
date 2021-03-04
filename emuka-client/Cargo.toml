@@ -20,3 +20,8 @@ log = "0.4"
 env_logger = "*"
 uuid = "0.8"
 reqwest = { version = "0.11", features = ["json"] }
+
+
+[[bin]]
+name = "emuka-client"
+path = "./src/main.rs"
