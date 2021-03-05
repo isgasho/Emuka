@@ -2,3 +2,6 @@
 *.log
 .vscode
 .git
+lib
+game
+docker

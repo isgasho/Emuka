@@ -20,11 +20,12 @@ fn build_sameboy() {
 
     set_current_dir(format!("../{}", SAMEBOY_PATH)).unwrap();
 
+
+    // Fine if it crash
     Command::new("sh")
             .arg("-c")
             .arg("make clean")
-            .output()
-            .expect("failed to execute process");
+            .output();
 
     let output = if std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap() == "windows" {
         Command::new("sh")
@@ -35,7 +36,7 @@ fn build_sameboy() {
     } else {
         Command::new("sh")
             .arg("-c")
-            .arg("make CC=clang libretro")
+            .arg("make CC=clang -C libretro")
             .output()
             .expect("failed to execute process")
     };
@@ -61,8 +62,8 @@ fn build_sameboy() {
 
     set_current_dir("../..").unwrap();
 
-    println!("{:?}", std::env::current_dir());
 
+    std::fs::create_dir_all("./lib").unwrap();
     copy(format!("{}./build/bin/sameboy_libretro.a", SAMEBOY_PATH), "./lib/libsameboy.a").unwrap();
 
     let bindings_path = if std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap() == "windows" {
@@ -71,7 +72,6 @@ fn build_sameboy() {
         "bindings_unix.rs"
     };
 
-    // Write the bindings to the $OUT_DIR/bindings.rs file.
     let out_path = PathBuf::from(String::from("./emuka-server/src/emulators/sameboy/bindings"));
     bindings
         .write_to_file(out_path.join(bindings_path))
