@@ -56,7 +56,17 @@ impl SameBoyEmulator {
         println!("Game loaded");
     }
 
+    fn unload_game(&mut self) {
+        self.running = false;
+        self.game_path = None;
+        wrapper::unload_game();
+    }
+
     fn load_save(&mut self, save: Box<dyn game::Save>) {
+        if self.game_path.is_none() {
+            return;
+        }
+
         if save.can_write() {
             self.save_path = Some(save.path().unwrap()
                 .to_str().unwrap()
@@ -149,6 +159,7 @@ impl super::Emulator for SameBoyEmulator {
             Save => self.save(),
             Stop => return false,
             LoadGame(game) => self.load_game(game),
+            UnloadGame => self.unload_game(),
             LoadSave(save) => self.load_save(save),
             Pause => self.running = false,
             Resume => self.running = true,

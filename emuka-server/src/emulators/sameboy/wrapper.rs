@@ -499,7 +499,12 @@ pub fn get_screen_data() -> Option<ScreenData> {
 }
 
 pub fn unload_game() {
-    // TODO: implement unload screen data
+    let mut lock = SCREEN_DATA.lock().unwrap();
+    *lock = SameboyScreenData {
+        data: Vec::new(),
+        width: 0,
+        height: 0
+    };
 
     unsafe {
         bindings::retro_unload_game();

@@ -1,10 +1,12 @@
 pub mod api;
 
+use std::sync::mpsc::Sender;
+
 use tokio::sync::mpsc::UnboundedSender;
-use crate::emulators::EmulatorCommand;
+use crate::{audio::AudioCommand, emulators::EmulatorCommand};
 use warp::{Filter, hyper::Method};
 
-pub async fn init(sender: UnboundedSender<EmulatorCommand>) {
+pub async fn init(emulator_sender: UnboundedSender<EmulatorCommand>, audio_sender: Sender<AudioCommand>) {
     // env_logger::init();
     // let log = warp::log("emuka");
 
@@ -14,7 +16,7 @@ pub async fn init(sender: UnboundedSender<EmulatorCommand>) {
         .allow_methods(&[Method::GET, Method::POST]);
 
     let routes = warp::path("api")
-        .and(api::routes(sender))
+        .and(api::routes(emulator_sender, audio_sender))
         .with(cors);
         // .with(log); 
 

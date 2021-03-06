@@ -18,6 +18,7 @@ pub trait Emulator {
 #[derive(Debug)]
 pub enum EmulatorCommand {
     LoadGame(Box<dyn Game>),
+    UnloadGame,
     LoadSave(Box<dyn Save>),
     RunFrame,
     Save,

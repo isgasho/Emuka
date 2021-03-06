@@ -1,6 +1,8 @@
 use core::panic;
 use std::collections::{HashMap, VecDeque};
 use std::sync::Mutex;
+use std::sync::mpsc::*;
+
 
 use uuid::Uuid;
 
@@ -87,8 +89,43 @@ lazy_static! {
     pub(crate) static ref SAMPLES_MAP: Mutex<HashMap<Uuid, VecDeque<StereoSample>>> = Mutex::new(HashMap::new());
 }
 
+pub enum AudioCommand {
+    Resume,
+    Pause,
+}
 
-pub fn init_audio_stream() -> Stream {
+pub fn init() -> Sender<AudioCommand> {
+    let (sender, receiver) = channel::<AudioCommand>();
+
+    tokio::spawn(async move {
+        let stream = init_audio_stream();
+        loop {
+            let command = receiver.recv();
+            
+            match command {
+                Ok(command) => match command {
+                    AudioCommand::Resume => {
+                        stream.play().unwrap();
+                    },
+                    AudioCommand::Pause => {
+                        stream.pause().unwrap();
+                    },
+                },
+                Err(err) => {
+                    println!("{:?}", err);
+                    break;
+                }
+            };
+        }
+        println!("Stream dropped ?");
+    });
+
+
+    sender
+}
+
+
+fn init_audio_stream() -> Stream {
     let host = cpal::default_host();
     let device = host.default_output_device().expect("no output device available");
     println!("{}", device.name().unwrap());

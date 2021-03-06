@@ -1,5 +1,5 @@
 pub mod api;
-use crate::{audio::VecStereoWrapper, emulators::ScreenData, server::api::v1::api::*};
+use crate::{audio::{AudioCommand, VecStereoWrapper}, emulators::ScreenData, server::api::v1::api::*};
 
 use std::{collections::VecDeque, convert::TryInto};
 
@@ -13,17 +13,17 @@ use crate::{audio::{SAMPLE_RATE, StereoSample}, emulators::{EmulatorCommand, Emu
 use crate::audio::SAMPLES_MAP;
 
 
-use super::{CommandSender};
+use super::{AudioCommandSender, EmulatorCommandSender};
 
 async fn load_game(
     game_api: GameFromFileApi,
-    sender: CommandSender
+    emulator_sender: EmulatorCommandSender
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let result: Result<GameFromFile, Report> = game_api.try_into();
 
     let reply = match result {
         Ok(game) => {
-            sender.send_command(EmulatorCommand::LoadGame(Box::from(game)));
+            emulator_sender.send_command(EmulatorCommand::LoadGame(Box::from(game)));
             Ok(warp::reply::with_status(warp::reply(), warp::http::StatusCode::OK))
         },
         Err(err) => {
@@ -34,9 +34,18 @@ async fn load_game(
     reply
 }
 
+async fn unload_game(
+    emulator_sender: EmulatorCommandSender,
+    audio_sender: AudioCommandSender,
+) -> Result<impl warp::Reply, warp::Rejection> {
+    audio_sender.send_command(AudioCommand::Pause);
+    emulator_sender.send_command(EmulatorCommand::UnloadGame);
+    Ok(warp::reply())
+}
+
 async fn load_save(
     save_api: SaveFromFileApi,
-    sender: CommandSender
+    sender: EmulatorCommandSender
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let result: Result<SaveFile, Report> = save_api.try_into();
 
@@ -54,16 +63,17 @@ async fn load_save(
 }
 
 async fn resume(
-    sender: CommandSender
+    emulator_sender: EmulatorCommandSender,
+    audio_sender: AudioCommandSender,
 ) -> Result<impl warp::Reply, warp::Rejection> {
-    sender.send_command(EmulatorCommand::Resume);
-
+    audio_sender.send_command(AudioCommand::Resume);
+    emulator_sender.send_command(EmulatorCommand::Resume);
     Ok(warp::reply())
 }
 
 async fn input(
     input_api: EmulatorJoypadInputApi,
-    sender: CommandSender
+    sender: EmulatorCommandSender
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let input: (EmulatorJoypadInput, bool) = input_api.into();
     sender.send_command(EmulatorCommand::Input(input));
@@ -71,7 +81,7 @@ async fn input(
 }
 
 async fn get_screen_data(
-    sender: CommandSender
+    sender: EmulatorCommandSender
 ) -> Result<impl warp::Reply, warp::Rejection> {
     let (os_sender, os_receiver) = oneshot::channel::<Option<ScreenData>>();
     sender.send_command(EmulatorCommand::GetScreenData(os_sender));
@@ -93,7 +103,7 @@ async fn get_screen_data(
 }
 
 async fn save(
-    sender: CommandSender
+    sender: EmulatorCommandSender
 ) -> Result<impl warp::Reply, warp::Rejection> {
     sender.send_command(EmulatorCommand::Save);
     Ok(warp::reply())
@@ -148,16 +158,25 @@ async fn get_audio_samples (
 }
 
 
-pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
-    let command_filter = warp::any().map(move || sender.clone());
+pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommandSender) -> BoxedFilter<(impl Reply,)> {
+    let emulator_command_filter = warp::any().map(move || emulator_sender.clone());
+    let audio_command_filter = warp::any().map(move || audio_sender.clone());
     
     let load_game_f = warp::post()
         .and(warp::path("game"))
         .and(warp::path("load"))
         .and(warp::path::end())
         .and(post_json::<GameFromFileApi>())
-        .and(command_filter.clone())
+        .and(emulator_command_filter.clone())
         .and_then(load_game);
+    
+    let unload_game_f = warp::get()
+        .and(warp::path("game"))
+        .and(warp::path("unload"))
+        .and(warp::path::end())
+        .and(emulator_command_filter.clone())
+        .and(audio_command_filter.clone())
+        .and_then(unload_game);
     
 
     let load_save_f = warp::post()
@@ -165,33 +184,34 @@ pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
         .and(warp::path("load"))
         .and(warp::path::end())
         .and(post_json::<SaveFromFileApi>())
-        .and(command_filter.clone())
+        .and(emulator_command_filter.clone())
         .and_then(load_save);
 
     let resume_f = warp::get()
         .and(warp::path("resume"))
         .and(warp::path::end())
-        .and(command_filter.clone())
+        .and(emulator_command_filter.clone())
+        .and(audio_command_filter.clone())
         .and_then(resume);
 
     let input_f = warp::post()
         .and(warp::path("input"))
         .and(warp::path::end())
         .and(post_json::<EmulatorJoypadInputApi>())
-        .and(command_filter.clone())
+        .and(emulator_command_filter.clone())
         .and_then(input);
 
     let get_screen_data_f = warp::get()
         .and(warp::path("screen"))
         .and(warp::path::end())
-        .and(command_filter.clone())
+        .and(emulator_command_filter.clone())
         .and_then(get_screen_data);
 
     let safe_f = warp::get()
         .and(warp::path("save"))
         .and(warp::path("save"))
         .and(warp::path::end())
-        .and(command_filter.clone())
+        .and(emulator_command_filter.clone())
         .and_then(save);
 
     let register_audio_queue_f = warp::get()
@@ -209,6 +229,7 @@ pub fn routes(sender: CommandSender) -> BoxedFilter<(impl Reply,)> {
 
     load_game_f
     .or(load_save_f)
+    .or(unload_game_f)
     .or(resume_f)
     .or(input_f)
     .or(get_screen_data_f)
