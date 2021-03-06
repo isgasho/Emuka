@@ -1,3 +1,4 @@
+use core::panic;
 use std::collections::{HashMap, VecDeque};
 use std::sync::Mutex;
 
@@ -43,47 +44,38 @@ impl StereoSample {
     }
 }
 
+
+
+
 pub struct VecStereoWrapper {
     pub inner: Option<Vec<StereoSample>>
 }
 
-impl From<String> for VecStereoWrapper {
-    fn from(base64data: String) -> Self {
-        let data = base64::decode(base64data);
-        
-        let inner = match data {
-            Err(_) => None,
-            Ok(data) => {
-                if data.len() % 4 != 0 {
-                    None
-                } else {
-                    let mut samples: Vec<StereoSample> = vec![];
-                    for chunk in data.chunks_exact(4) {
-                        samples.push(StereoSample::from_byte_array(chunk));
-                    }
-                    Some(samples)
-                }
-            }
-        };
-        
+impl From<Vec<u8>> for VecStereoWrapper {
+    fn from(bytes: Vec<u8>) -> Self {
+        let mut samples: Vec<StereoSample> = vec![];
+        for chunk in bytes.chunks_exact(4) {
+            samples.push(StereoSample::from_byte_array(chunk));
+        }
+
         Self {
-            inner
+            inner: Some(samples) 
         }
     }
 }
 
-impl Into<String> for VecStereoWrapper {
-    fn into(self) -> String {
+impl Into<Vec<u8>> for VecStereoWrapper {
+    fn into(self) -> Vec<u8> {
         match self.inner {
-            None => String::new(),
+            None => Vec::new(),
             Some(samples) => {
-                let mut data: Vec<u8> = vec![];
+                let mut samples_data: Vec<u8> = vec![];
                 
                 for sample in samples {
-                    data.extend_from_slice(&sample.to_byte_array());
+                    samples_data.extend_from_slice(&sample.to_byte_array());
                 }
 
-                base64::encode(data)
+                samples_data
             }
         }
     }

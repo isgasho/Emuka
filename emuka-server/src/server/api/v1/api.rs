@@ -2,8 +2,12 @@ use std::convert::TryInto;
 
 use uuid::Uuid;
 use warp::Filter;
+use avro_rs::{Schema};
+use lazy_static::lazy_static;
 
 use crate::{emulators::{EmulatorJoypadInput, ScreenData}, game::{GameFromFile, SaveFile}};
+
+
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct GameFromFileApi {
@@ -54,9 +58,25 @@ impl Into<(EmulatorJoypadInput, bool)> for EmulatorJoypadInputApi {
 
 #[derive(Debug, Serialize, Clone)]
 pub struct ScreenDataApi {
-    pub screen: Option<String>,
+    pub screen: Vec<u8>,
     pub width: u32,
     pub height: u32
+}
+
+lazy_static! {
+    static ref RAW_SCHEMA_SCREEN_DATA_API: &'static str = r#"
+        {
+            "type": "record",
+            "name": "ScreenData",
+            "fields": [
+                {"name": "screen", "type": "bytes"},
+                {"name": "width", "type": "int", "default": 0},
+                {"name": "height", "type": "int", "default": 0}
+            ]
+        }
+    "#;
+
+    pub static ref SCREEN_DATA_API_SCHEMA: Schema = Schema::parse_str(&RAW_SCHEMA_SCREEN_DATA_API).unwrap();
 }
 
 impl From<Option<ScreenData>> for ScreenDataApi {
@@ -65,10 +85,10 @@ impl From<Option<ScreenData>> for ScreenDataApi {
             Some(screen_data) => Self {
                 width: screen_data.width,
                 height: screen_data.height,
-                screen: Some(base64::encode(screen_data.data))
+                screen: screen_data.data
             },
             None => Self {
-                screen: None,
+                screen: Vec::new(),
                 width: 0,
                 height: 0
             }
@@ -82,6 +102,19 @@ pub struct AudioRegisterApi {
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct GetAudioSamplesResponseApi {
-    pub data: Option<String>
+    pub data: Vec<u8>
 }
 
+lazy_static! {
+    static ref RAW_SCHEMA_AUDIO_DATA_API: &'static str = r#"
+        {
+            "type": "record",
+            "name": "AudioData",
+            "fields": [
+                {"name": "data", "type": "bytes"}
+            ]
+        }
+    "#;
+
+    pub static ref AUDIO_DATA_API_SCHEMA: Schema = Schema::parse_str(&RAW_SCHEMA_AUDIO_DATA_API).unwrap();
+}

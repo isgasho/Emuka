@@ -1,9 +1,11 @@
+use core::panic;
 use std::{collections::VecDeque, sync::Mutex};
 
+use avro_rs::{Reader, types::Value};
 use cpal::{OutputCallbackInfo, SampleFormat, SampleRate, Stream, SupportedStreamConfigRange, traits::{DeviceTrait, HostTrait, StreamTrait}};
 use eyre::Result;
 
-use emuka_server::{audio::{SAMPLE_RATE, StereoSample, VecStereoWrapper}, server::api::v1::api::{AudioRegisterApi, GetAudioSamplesResponseApi}};
+use emuka_server::{audio::{SAMPLE_RATE, StereoSample, VecStereoWrapper}, server::api::v1::api::{AUDIO_DATA_API_SCHEMA, AudioRegisterApi}};
 use lazy_static::lazy_static;
 use tokio::time;
 
@@ -91,8 +93,33 @@ T: cpal::Sample {
     }
 }
 
-fn write_encoded_samples(base64encoded: String) {
-    let wrapper = VecStereoWrapper::from(base64encoded);
+
+
+fn decode_avro_data_samples(avro_data: &[u8]) -> Vec<u8> {
+    let reader = Reader::with_schema(&AUDIO_DATA_API_SCHEMA, &avro_data[..]).unwrap();
+    for record in reader {
+        match record.unwrap() {
+            Value::Record(fields) => {
+                let bytes = &fields.get(0).unwrap().1;
+                match bytes {
+                    Value::Bytes(data) => {
+                        return data.clone()
+                    },
+                    _ => panic!()
+                }
+            },
+            _  => panic!()
+        }
+    }
+    return Vec::new();
+}
+
+fn write_encoded_samples(avro_data: &[u8]) {
+    let decoded = decode_avro_data_samples(avro_data);
+    let wrapper = VecStereoWrapper::from(decoded);
+
+    println!("{:?}", wrapper.inner.as_ref().unwrap().len());
+
     if let Some(data) = wrapper.inner {
         let mut lock = SAMPLES.lock().unwrap();
         lock.extend(data.into_iter());
@@ -122,16 +149,14 @@ pub async fn init_audio_requests(base: String) -> Result<()> {
                     continue;
                 },
                 Ok(response) => {
-                    let data = response.json::<GetAudioSamplesResponseApi>().await;
+                    let data = response.bytes().await;
                     match data {
                         Err(err) => {
                             println!("{}", err);
                             continue;
                         },
                         Ok(data) => {
-                            if let Some(encoded_samples) = data.data {
-                                write_encoded_samples(encoded_samples);
-                            }
+                            write_encoded_samples(&data);
                         }
                     }
                 }

@@ -7,6 +7,7 @@ use color_eyre::Report;
 use tokio::sync::oneshot;
 use warp::{Filter, Reply, filters::BoxedFilter};
 use uuid::Uuid;
+use avro_rs::{Codec, Writer, types::Record};
 
 use crate::{audio::{SAMPLE_RATE, StereoSample}, emulators::{EmulatorCommand, EmulatorJoypadInput}, game::{GameFromFile, SaveFile}};
 use crate::audio::SAMPLES_MAP;
@@ -75,8 +76,20 @@ async fn get_screen_data(
     let (os_sender, os_receiver) = oneshot::channel::<Option<ScreenData>>();
     sender.send_command(EmulatorCommand::GetScreenData(os_sender));
     let value = os_receiver.await.unwrap();
-    let data = ScreenDataApi::from(value);
-    Ok(warp::reply::json(&data))
+    let screen_data = ScreenDataApi::from(value);
+    
+    
+    let mut writer = Writer::with_codec(&api::SCREEN_DATA_API_SCHEMA, Vec::new(), Codec::Snappy);
+    let mut record = Record::new(writer.schema()).unwrap();
+
+    record.put("screen", screen_data.screen);
+    record.put("width", screen_data.width as i32);
+    record.put("height", screen_data.height as i32);
+
+    writer.append(record).unwrap();
+    let data = writer.into_inner().unwrap();
+
+    Ok(warp::http::Response::new(data))
 }
 
 async fn save(
@@ -110,26 +123,28 @@ async fn get_audio_samples (
         queue.map(|q| q.drain(..).collect::<Vec<StereoSample>>())
     };
 
-    match data {
+    let mut writer = Writer::with_codec(&api::AUDIO_DATA_API_SCHEMA, Vec::new(), Codec::Snappy);
+    let mut record = Record::new(writer.schema()).unwrap();
+
+
+    let bytes: Vec<u8> = match data {
         Some(samples) => {
             let wrapper = VecStereoWrapper {
                 inner: Some(samples)
             };
-            let encoded: String = wrapper.into();
-            let res = GetAudioSamplesResponseApi {
-                data: Some(encoded)
-            };
-        
-            Ok(warp::reply::json(&res))
+            wrapper.into()
         }
         None => {
-            let res = GetAudioSamplesResponseApi {
-                data: None
-            };
-        
-            Ok(warp::reply::json(&res))
+            Vec::new()
         }
-    }
+    };
+    
+    record.put("data", bytes);
+
+    writer.append(record).unwrap();
+    let data = writer.into_inner().unwrap();
+
+    Ok(warp::http::Response::new(data))
 }
 
 

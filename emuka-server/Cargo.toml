@@ -18,6 +18,7 @@ base64 = "0.13"
 log = "0.4"
 env_logger = "*"
 uuid = { version = "0.8", features = ["serde", "v4" ]}
+avro-rs = { version = "0.13", features = ["snappy"] }
 
 [build-dependencies]
 bindgen = "0.57"

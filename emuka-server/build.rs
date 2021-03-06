@@ -21,11 +21,10 @@ fn build_sameboy() {
     set_current_dir(format!("../{}", SAMEBOY_PATH)).unwrap();
 
 
-    // Fine if it crash
     Command::new("sh")
             .arg("-c")
             .arg("make clean")
-            .output();
+            .output().unwrap();
 
     let output = if std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap() == "windows" {
         Command::new("sh")
