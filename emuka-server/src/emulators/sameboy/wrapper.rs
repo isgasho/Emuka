@@ -1,4 +1,4 @@
-use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::Path, sync::{Mutex, RwLock, atomic::AtomicPtr}};
+use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::Path, sync::{Mutex, RwLock}};
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
 use eyre::*;
@@ -542,11 +542,5 @@ pub fn save <P: AsRef<Path>> (path: P) {
 pub fn set_audio_frequency(frequency: u32) {
     unsafe {
         bindings::emuka_set_audio_frequency(frequency);
-    }
-}
-
-pub fn read_memory() -> bool {
-    unsafe {
-        bindings::emuka_read_remory()
     }
 }
