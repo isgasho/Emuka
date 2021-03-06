@@ -1,15 +1,15 @@
 # Erika Emulator
 > Or Emuka, for short
 
-Wraps an emulator backend(currently only [SameBoy](https://github.com/LIJI32/SameBoy)) as a headless webserver, and allows it to be queried for its state or to interact with it.
+Wraps an emulator backend (currently only [SameBoy](https://github.com/LIJI32/SameBoy)) as a headless webserver, and allows it to be queried for its state or to interact with it.
 
 Streams the audio to the OS's native interfaces, but does not plan to provide any kind of GUI, and it must instead be implemented separately by querying the API.
 
 Built for being used by [BSDj](https://github.com/ShinySaana/BSDj). If you think Emuka can be useful for your own project, let's talk!
 
 Emuka is divided in two parts:
-- `emuka-server`: the main binary, act as a standalone binary.
-- `emuka-client`: remotely connects to a server and forwards requests to it, while still handling the audio part natively. Will be implemented later, and currently exist as a PoC.
+- `emuka-server`: the main binary, act as a standalone server.
+- `emuka-client`: remotely connects to a server and forwards requests to it, while still handling the audio part natively. Will be implemented later, and currently only exists as a PoC.
 
 Currently in alpha.
 
