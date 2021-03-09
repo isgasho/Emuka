@@ -3684,3 +3684,6 @@ extern "C" {
 extern "C" {
     pub fn emuka_read_remory() -> bool;
 }
+extern "C" {
+    pub fn emuka_run_stealth(jump_location: u16);
+}

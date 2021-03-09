@@ -130,6 +130,11 @@ impl SameBoyEmulator {
             wrapper::save(&save_path);
         }
     }
+
+    fn run_stealth(&mut self, jump_location: u32) {
+        let converted = jump_location as u16;
+        wrapper::run_stealth(converted);
+    }
 }
 
 const FRAME_RATE: f32 = 59.7154;
@@ -151,6 +156,7 @@ impl super::Emulator for SameBoyEmulator {
         
         match command {
             RunFrame => self.run_frame(),
+            RunStealth(jump_location) => self.run_stealth(jump_location),
             GetScreenData(sender) => sender.send(wrapper::get_screen_data()).unwrap(),
             Input((input, pressed)) => {
                let sb_input = wrapper::SameboyJoypadInput::from(input);

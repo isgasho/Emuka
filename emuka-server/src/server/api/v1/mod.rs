@@ -157,6 +157,14 @@ async fn get_audio_samples (
     Ok(warp::http::Response::new(data))
 }
 
+async fn run_stealth (
+    run_stealth_api: RunStealthApi,
+    emulator_sender: EmulatorCommandSender
+)  -> Result<impl warp::Reply, warp::Rejection> {
+    emulator_sender.send_command(EmulatorCommand::RunStealth(run_stealth_api.jump_location));
+
+    Ok(warp::reply())
+}
 
 pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommandSender) -> BoxedFilter<(impl Reply,)> {
     let emulator_command_filter = warp::any().map(move || emulator_sender.clone());
@@ -227,6 +235,14 @@ pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommand
         .and(warp::path::end())
         .and_then(get_audio_samples);
 
+    let run_stealth_f = warp::post()
+        .and(warp::path("debug"))
+        .and(warp::path("run_stealth"))
+        .and(warp::path::end())
+        .and(post_json::<RunStealthApi>())
+        .and(emulator_command_filter.clone())
+        .and_then(run_stealth);
+
     load_game_f
     .or(load_save_f)
     .or(unload_game_f)
@@ -236,6 +252,7 @@ pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommand
     .or(safe_f)
     .or(register_audio_queue_f)
     .or(get_audio_samples_f)
+    .or(run_stealth_f)
     .boxed()
 }
 

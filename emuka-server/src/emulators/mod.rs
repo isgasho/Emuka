@@ -21,6 +21,7 @@ pub enum EmulatorCommand {
     UnloadGame,
     LoadSave(Box<dyn Save>),
     RunFrame,
+    RunStealth(u32),
     Save,
     GetScreenData(Sender<Option<ScreenData>>),
     Pause,

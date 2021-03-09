@@ -544,3 +544,9 @@ pub fn set_audio_frequency(frequency: u32) {
         bindings::emuka_set_audio_frequency(frequency);
     }
 }
+
+pub fn run_stealth(jump_location: u16) {
+    unsafe {
+        bindings::emuka_run_stealth(jump_location);
+    }
+}

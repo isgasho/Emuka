@@ -55,6 +55,10 @@ impl Into<(EmulatorJoypadInput, bool)> for EmulatorJoypadInputApi {
         (self.input, self.pressed)
     }
 }
+#[derive(Debug, Deserialize, Clone)]
+pub struct RunStealthApi {
+    pub jump_location: u32
+}
 
 #[derive(Debug, Serialize, Clone)]
 pub struct ScreenDataApi {
