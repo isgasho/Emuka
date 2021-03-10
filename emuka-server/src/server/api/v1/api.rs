@@ -1,4 +1,4 @@
-use std::convert::TryInto;
+use std::{collections::HashMap, convert::TryInto};
 
 use uuid::Uuid;
 use warp::Filter;
@@ -56,8 +56,42 @@ impl Into<(EmulatorJoypadInput, bool)> for EmulatorJoypadInputApi {
     }
 }
 #[derive(Debug, Deserialize, Clone)]
-pub struct RunStealthApi {
-    pub jump_location: u32
+pub struct RunStealthRequestApi {
+    pub jump_location: u32,
+    pub state: HashMap<String, u32>
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct RunStealthResponseApi {
+    pub result: HashMap<String, u32>
+}
+
+impl RunStealthResponseApi {
+    pub fn new(result: HashMap<String, u32>) -> Self {
+        Self {
+            result
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct ReadMemoryRequestApi {
+    pub request: String,
+}
+
+
+
+#[derive(Debug, Serialize, Clone)]
+pub struct ReadMemoryResponseApi {
+    pub result: String
+}
+
+impl ReadMemoryResponseApi {
+    pub fn new(result: String) -> Self {
+        Self {
+            result
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Clone)]

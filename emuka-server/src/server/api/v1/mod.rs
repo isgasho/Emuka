@@ -1,7 +1,7 @@
 pub mod api;
 use crate::{audio::{AudioCommand, VecStereoWrapper}, emulators::ScreenData, server::api::v1::api::*};
 
-use std::{collections::VecDeque, convert::TryInto};
+use std::{collections::{HashMap, VecDeque}, convert::TryInto};
 
 use color_eyre::Report;
 use tokio::sync::oneshot;
@@ -158,12 +158,44 @@ async fn get_audio_samples (
 }
 
 async fn run_stealth (
-    run_stealth_api: RunStealthApi,
+    run_stealth_api: RunStealthRequestApi,
     emulator_sender: EmulatorCommandSender
 )  -> Result<impl warp::Reply, warp::Rejection> {
-    emulator_sender.send_command(EmulatorCommand::RunStealth(run_stealth_api.jump_location));
+    let (os_sender, os_receiver) = oneshot::channel::<Option<HashMap<String, u32>>>();
+    emulator_sender.send_command(EmulatorCommand::RunStealth(run_stealth_api.jump_location, run_stealth_api.state, os_sender));
 
-    Ok(warp::reply())
+    let value = os_receiver.await.unwrap();
+
+    match value {
+        Some(data) => {
+            let response = RunStealthResponseApi::new(data);
+            Ok(warp::reply::with_status(warp::reply::json(&response), warp::http::StatusCode::OK).into_response())
+        }
+        None => {
+            Ok(warp::reply::with_status(warp::reply(), warp::http::StatusCode::BAD_REQUEST).into_response())
+        }
+    }
+}
+
+async fn read_memory (
+    request: ReadMemoryRequestApi,
+    emulator_sender: EmulatorCommandSender
+)  -> Result<warp::reply::Response, warp::Rejection> {
+    let (os_sender, os_receiver) = oneshot::channel::<Option<String>>();
+
+    emulator_sender.send_command(EmulatorCommand::ReadMemory(request.request, os_sender));
+
+    let value = os_receiver.await.unwrap();
+
+    match value {
+        Some(data) => {
+            let response = ReadMemoryResponseApi::new(data);
+            Ok(warp::reply::with_status(warp::reply::json(&response), warp::http::StatusCode::OK).into_response())
+        }
+        None => {
+            Ok(warp::reply::with_status(warp::reply(), warp::http::StatusCode::BAD_REQUEST).into_response())
+        }
+    }
 }
 
 pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommandSender) -> BoxedFilter<(impl Reply,)> {
@@ -236,12 +268,21 @@ pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommand
         .and_then(get_audio_samples);
 
     let run_stealth_f = warp::post()
-        .and(warp::path("debug"))
+        .and(warp::path("internal"))
         .and(warp::path("run_stealth"))
         .and(warp::path::end())
-        .and(post_json::<RunStealthApi>())
+        .and(post_json::<RunStealthRequestApi>())
         .and(emulator_command_filter.clone())
         .and_then(run_stealth);
+
+    let read_memory_f = warp::post()
+        .and(warp::path("internal"))
+        .and(warp::path("read_memory"))
+        .and(warp::path::end())
+        .and(post_json::<ReadMemoryRequestApi>())
+        .and(emulator_command_filter.clone())
+        .and_then(read_memory);
+    
 
     load_game_f
     .or(load_save_f)
@@ -253,6 +294,7 @@ pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommand
     .or(register_audio_queue_f)
     .or(get_audio_samples_f)
     .or(run_stealth_f)
+    .or(read_memory_f)
     .boxed()
 }
 

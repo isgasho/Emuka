@@ -1,5 +1,7 @@
 pub mod sameboy;
 
+use std::collections::HashMap;
+
 use tokio::{sync::mpsc::{UnboundedSender, unbounded_channel}, time};
 use tokio::sync::oneshot::Sender;
 
@@ -21,7 +23,8 @@ pub enum EmulatorCommand {
     UnloadGame,
     LoadSave(Box<dyn Save>),
     RunFrame,
-    RunStealth(u32),
+    RunStealth(u32, HashMap<String, u32>, Sender<Option<HashMap<String, u32>>>),
+    ReadMemory(String, Sender<Option<String>>),
     Save,
     GetScreenData(Sender<Option<ScreenData>>),
     Pause,

@@ -1,4 +1,4 @@
-use std::{convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::Path, sync::{Mutex, RwLock}};
+use std::{collections::HashMap, convert::TryFrom, ffi::{CStr, CString, c_void}, os::raw::c_uint, panic::{AssertUnwindSafe, catch_unwind}, path::Path, sync::{Mutex, RwLock}};
 use lazy_static::lazy_static;
 use num_enum::TryFromPrimitive;
 use eyre::*;
@@ -545,8 +545,65 @@ pub fn set_audio_frequency(frequency: u32) {
     }
 }
 
-pub fn run_stealth(jump_location: u16) {
+#[derive(Debug, Default)]
+struct SameBoyRegisters {
+    af: u16,
+    bc: u16,
+    de: u16,
+    hf: u16,
+    sp: u16
+}
+
+impl SameBoyRegisters {
+    pub fn to_array(self) -> [u16; 5] {
+        [self.af, self.bc, self.de, self.hf, self.sp]
+    }
+
+    pub fn fill_state(registers: [u16; 5], state: &mut HashMap<String, u32>) {
+        state.insert("af".to_owned(), registers[0] as u32);
+        state.insert("bc".to_owned(), registers[1] as u32);
+        state.insert("de".to_owned(), registers[2] as u32);
+        state.insert("hf".to_owned(), registers[3] as u32);
+        state.insert("sp".to_owned(), registers[4] as u32);
+    }
+
+    fn from(state: &HashMap<String, u32>) -> Self {
+        Self {
+            af: state.get("af").unwrap_or(&0).clone() as u16,
+            bc: state.get("bc").unwrap_or(&0).clone() as u16,
+            de: state.get("de").unwrap_or(&0).clone() as u16,
+            hf: state.get("hf").unwrap_or(&0).clone() as u16,
+            sp: state.get("sp").unwrap_or(&0).clone() as u16
+        }
+    }
+}
+
+
+
+pub fn run_stealth(jump_location: u16, state: &mut HashMap<String, u32>) {
+
+    let mut registers = SameBoyRegisters::from(state).to_array();
+    
     unsafe {
-        bindings::emuka_run_stealth(jump_location);
+        bindings::emuka_run_stealth(jump_location, registers.as_mut_ptr());
+    }
+
+    SameBoyRegisters::fill_state(registers, state);
+}
+
+pub fn read_memory(request: String) -> Option<String> {
+    let mut result: u16 = 0;
+    let mut bank: u16 = 0;
+    let c_request = CString::new(request).ok()?; 
+
+    unsafe {
+        let error = bindings::emuka_evaluate(c_request.as_c_str().as_ptr(), &mut result, &mut bank);
+
+        
+        if error {
+            None
+        } else {
+            Some(format!("{}:0x{:X}", bank as i16, result))
+        }
     }
 }

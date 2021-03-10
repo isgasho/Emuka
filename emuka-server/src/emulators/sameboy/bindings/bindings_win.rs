@@ -3985,7 +3985,14 @@ extern "C" {
     pub fn emuka_set_audio_frequency(frequency: ::std::os::raw::c_uint);
 }
 extern "C" {
-    pub fn emuka_read_remory() -> bool;
+    pub fn emuka_evaluate(
+        expr: *const ::std::os::raw::c_char,
+        result: *mut u16,
+        result_bank: *mut u16,
+    ) -> bool;
+}
+extern "C" {
+    pub fn emuka_run_stealth(jump_location: u16, registers: *mut u16);
 }
 pub type __builtin_va_list = *mut ::std::os::raw::c_char;
 #[repr(C)]

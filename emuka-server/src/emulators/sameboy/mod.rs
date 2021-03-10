@@ -1,4 +1,6 @@
-use std::time::Instant;
+use std::{collections::HashMap, time::Instant};
+
+use tokio::sync::oneshot::Sender;
 
 use crate::game::{self, Game};
 
@@ -131,9 +133,14 @@ impl SameBoyEmulator {
         }
     }
 
-    fn run_stealth(&mut self, jump_location: u32) {
+    fn run_stealth(&mut self, jump_location: u32, mut state: HashMap<String, u32>, sender: Sender<Option<HashMap<String, u32>>>) {
         let converted = jump_location as u16;
-        wrapper::run_stealth(converted);
+        wrapper::run_stealth(converted, &mut state);
+        sender.send(Some(state)).unwrap();
+    }
+
+    fn read_memory(&mut self, request: String, sender: Sender<Option<String>>) {
+        sender.send(wrapper::read_memory(request)).unwrap();
     }
 }
 
@@ -150,13 +157,13 @@ impl super::Emulator for SameBoyEmulator {
         wrapper::init();
     }
 
-
     fn handle_command(&mut self, command: super::EmulatorCommand) -> bool {
         use EmulatorCommand::*;
         
         match command {
             RunFrame => self.run_frame(),
-            RunStealth(jump_location) => self.run_stealth(jump_location),
+            RunStealth(jump_location, state, sender) => self.run_stealth(jump_location, state, sender),
+            ReadMemory(request, sender) => self.read_memory(request, sender),
             GetScreenData(sender) => sender.send(wrapper::get_screen_data()).unwrap(),
             Input((input, pressed)) => {
                let sb_input = wrapper::SameboyJoypadInput::from(input);
