@@ -5,7 +5,7 @@ use warp::Filter;
 use avro_rs::{Schema};
 use lazy_static::lazy_static;
 
-use crate::{emulators::{EmulatorJoypadInput, ScreenData}, game::{GameFromFile, SaveFile}};
+use crate::{emulators::{EmulatorInternalCommand, EmulatorInternalCommandResults, EmulatorJoypadInput, ScreenData}, game::{GameFromFile, SaveFile}};
 
 
 
@@ -90,6 +90,43 @@ impl ReadMemoryResponseApi {
     pub fn new(result: String) -> Self {
         Self {
             result
+        }
+    }
+}
+
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct WriteMemoryRequestApi {
+    pub request: String,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct WriteMemoryResponseApi {
+    pub result: String
+}
+
+impl WriteMemoryResponseApi {
+    pub fn new(result: String) -> Self {
+        Self {
+            result
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct BurstRequestApi {
+    pub requests: Vec<EmulatorInternalCommand>
+}
+
+#[derive(Debug, Serialize)]
+pub struct BurstResponseApi {
+    pub results: EmulatorInternalCommandResults
+}
+
+impl BurstResponseApi {
+    pub fn new(results: EmulatorInternalCommandResults) -> Self {
+        Self {
+            results
         }
     }
 }

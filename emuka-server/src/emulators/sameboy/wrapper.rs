@@ -579,19 +579,20 @@ impl SameBoyRegisters {
 }
 
 
-
-pub fn run_stealth(jump_location: u16, state: &mut HashMap<String, u32>) {
-
+pub fn run_stealth(jump_location: u16, state: &mut HashMap<String, u32>) -> Result<()> {
     let mut registers = SameBoyRegisters::from(state).to_array();
-    
+
     unsafe {
+        assert!(registers.len() >= 5);
         bindings::emuka_run_stealth(jump_location, registers.as_mut_ptr());
     }
 
     SameBoyRegisters::fill_state(registers, state);
+
+    Ok(())
 }
 
-pub fn read_memory(request: String) -> Option<String> {
+pub fn evaluate(request: String) -> Option<String> {
     let mut result: u16 = 0;
     let mut bank: u16 = 0;
     let c_request = CString::new(request).ok()?; 

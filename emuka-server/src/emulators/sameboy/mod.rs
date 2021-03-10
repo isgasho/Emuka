@@ -1,10 +1,12 @@
 use std::{collections::HashMap, time::Instant};
-
+use eyre::Result;
 use tokio::sync::oneshot::Sender;
+use lazy_static::lazy_static;
+use onig::Regex;
 
 use crate::game::{self, Game};
 
-use super::EmulatorCommand;
+use super::{EmulatorCommand, EmulatorInternalCommand, EmulatorInternalCommandResult, EmulatorInternalCommandResults};
 
 #[allow(warnings)]
 mod bindings;
@@ -14,8 +16,9 @@ mod input;
 mod audio;
 mod video;
 
-pub static PATH: &str = "./game/lsdj4.5.1_TBC.gb";
-
+lazy_static! {
+    static ref RE_IS_ASSIGNMENT: Regex = Regex::new(r"(?<![>!<=])=(?!=)").unwrap();
+}
 #[derive(Debug)]
 pub struct SameBoyEmulator {
     game_path: Option<String>,
@@ -133,14 +136,78 @@ impl SameBoyEmulator {
         }
     }
 
-    fn run_stealth(&mut self, jump_location: u32, mut state: HashMap<String, u32>, sender: Sender<Option<HashMap<String, u32>>>) {
+    fn run_stealth(&mut self, jump_location: u32, mut state: HashMap<String, u32>) -> Result<HashMap<String, u32>> {
+        if !self.running {
+            return Err(eyre::Report::msg("Game is not running!"));
+        }
+
         let converted = jump_location as u16;
-        wrapper::run_stealth(converted, &mut state);
-        sender.send(Some(state)).unwrap();
+        wrapper::run_stealth(converted, &mut state).map(|_| state)
     }
 
-    fn read_memory(&mut self, request: String, sender: Sender<Option<String>>) {
-        sender.send(wrapper::read_memory(request)).unwrap();
+    fn run_stealth_and_send(&mut self, jump_location: u32, state: HashMap<String, u32>, sender: Sender<Option<HashMap<String, u32>>>) {
+        let result = self.run_stealth(jump_location, state);
+
+        match result {
+            Ok(state) => sender.send(Some(state)).unwrap(),
+            Err(_) => sender.send(None).unwrap()
+        }
+    }
+
+    fn read_memory(&mut self, request: String) -> Option<String> {
+        if RE_IS_ASSIGNMENT.find(&request).is_some() {
+            return None;
+        }
+
+        wrapper::evaluate(request)
+    }
+
+    fn read_memory_and_send(&mut self, request: String, sender: Sender<Option<String>>) {
+        sender.send(self.read_memory(request)).unwrap()
+    }
+
+    fn write_memory(&mut self, request: String) -> Option<String> {
+        if RE_IS_ASSIGNMENT.find(&request).is_none() {
+            return None;
+        }
+
+        wrapper::evaluate(request)
+    }
+
+    fn write_memory_and_send(&mut self, request: String, sender: Sender<Option<String>>) {
+        sender.send(self.write_memory(request)).unwrap()
+    }
+
+    fn burst(&mut self, commands: Vec<EmulatorInternalCommand>, sender: Sender<EmulatorInternalCommandResults>) {
+        let mut results: EmulatorInternalCommandResults = Vec::with_capacity(commands.len());
+        let commands_len = commands.len();
+
+        for command in commands {
+            match command {
+                EmulatorInternalCommand::ReadMemory{ request } => {
+                    let value = self.read_memory(request);
+                    results.push(value.map(|string| EmulatorInternalCommandResult::ReadMemory(string)));
+                }
+                EmulatorInternalCommand::WriteMemory{ request } => {
+                    let value = self.write_memory(request);
+                    results.push(value.map(|string| EmulatorInternalCommandResult::WriteMemory(string)));
+                }
+                EmulatorInternalCommand::RunStealth{ jump_location, state } => {
+                    match self.run_stealth(jump_location, state) {
+                        Ok(state) => results.push(Some(EmulatorInternalCommandResult::RunStealth(state))),
+                        Err(_) => results.push(None)
+                    };
+                }
+                EmulatorInternalCommand::RunFrame => {
+                    self.run_frame();
+                    results.push(None)
+                }
+            }
+        }
+
+        assert!(commands_len == results.len());
+
+        sender.send(results).unwrap();
     }
 }
 
@@ -162,8 +229,9 @@ impl super::Emulator for SameBoyEmulator {
         
         match command {
             RunFrame => self.run_frame(),
-            RunStealth(jump_location, state, sender) => self.run_stealth(jump_location, state, sender),
-            ReadMemory(request, sender) => self.read_memory(request, sender),
+            RunStealth(jump_location, state, sender) => self.run_stealth_and_send(jump_location, state, sender),
+            ReadMemory(request, sender) => self.read_memory_and_send(request, sender),
+            WriteMemory(request, sender) => self.write_memory_and_send(request, sender),
             GetScreenData(sender) => sender.send(wrapper::get_screen_data()).unwrap(),
             Input((input, pressed)) => {
                let sb_input = wrapper::SameboyJoypadInput::from(input);
@@ -176,6 +244,7 @@ impl super::Emulator for SameBoyEmulator {
             LoadSave(save) => self.load_save(save),
             Pause => self.running = false,
             Resume => self.running = true,
+            Burst(commands, sender) => self.burst(commands, sender)
         };
 
         true

@@ -25,13 +25,34 @@ pub enum EmulatorCommand {
     RunFrame,
     RunStealth(u32, HashMap<String, u32>, Sender<Option<HashMap<String, u32>>>),
     ReadMemory(String, Sender<Option<String>>),
+    WriteMemory(String, Sender<Option<String>>),
     Save,
     GetScreenData(Sender<Option<ScreenData>>),
     Pause,
     Resume,
     Input((EmulatorJoypadInput, bool)),
     Stop,
+    Burst(Vec<EmulatorInternalCommand>, Sender<EmulatorInternalCommandResults>)
 }
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "command", content = "args")]
+pub enum EmulatorInternalCommand {
+    ReadMemory { request: String },
+    WriteMemory { request: String },
+    RunStealth { jump_location: u32, state: HashMap<String, u32> },
+    RunFrame
+}
+
+pub type EmulatorInternalCommandResults = Vec<Option<EmulatorInternalCommandResult>>;
+
+#[derive(Debug, Serialize)]
+pub enum EmulatorInternalCommandResult {
+    ReadMemory(String),
+    WriteMemory(String),
+    RunStealth(HashMap<String, u32>)
+}
+
 
 #[derive(Debug, Deserialize, Copy, Clone)]
 pub enum EmulatorJoypadInput {
@@ -44,7 +65,7 @@ pub enum EmulatorJoypadInput {
     RIGHT,
     LEFT
 }
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ScreenData {
     pub data: Vec<u8>,
     pub width: u32,
