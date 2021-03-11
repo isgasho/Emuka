@@ -24,6 +24,9 @@ COPY . .
 
 RUN cargo build --release
 
+RUN strip ./target/release/emuka-server
+RUN strip ./target/release/emuka-client
+
 ARG USER=root
 RUN chown -R $USER:$USER /app
 

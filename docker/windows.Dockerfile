@@ -26,6 +26,9 @@ COPY . .
 RUN rustup target add x86_64-pc-windows-gnu
 RUN cargo build --release --target x86_64-pc-windows-gnu
 
+RUN strip ./target/x86_64-pc-windows-gnu/release/emuka-server.exe
+RUN strip ./target/x86_64-pc-windows-gnu/release/emuka-client.exe
+
 ARG USER=root
 RUN chown -R $USER:$USER /app
 
