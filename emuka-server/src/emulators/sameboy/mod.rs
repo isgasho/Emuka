@@ -171,6 +171,11 @@ impl SameBoyEmulator {
     }
 
     fn read_bulk_save_memory_and_send(&mut self, offset: usize, length: usize, sender: Sender<Option<Vec<u8>>>) {
+        if self.game_path.is_none() || !self.running {
+            sender.send(Some(Vec::new())).unwrap();
+            return;
+        }
+
         sender.send(self.read_bulk_save_memory(offset, length)).unwrap()
     }
 
