@@ -25,6 +25,7 @@ pub enum EmulatorCommand {
     RunFrame,
     RunStealth(u32, HashMap<String, u32>, Sender<Option<HashMap<String, u32>>>),
     ReadMemory(String, Sender<Option<String>>),
+    ReadBulkSaveMemory(usize, usize, Sender<Option<Vec<u8>>>),
     WriteMemory(String, Sender<Option<String>>),
     Save,
     GetScreenData(Sender<Option<ScreenData>>),

@@ -608,3 +608,23 @@ pub fn evaluate(request: String) -> Option<String> {
         }
     }
 }
+
+pub fn get_sram(offset: usize, length: usize) -> Result<Vec<u8>> {
+    let sram = unsafe {
+        let id = bindings::RETRO_MEMORY_SAVE_RAM;
+
+        let ptr: *const u8 = bindings::retro_get_memory_data(id).cast();
+        let size = bindings::retro_get_memory_size(id) as usize;
+
+        println!("{}", size);
+
+
+        if offset + length >= size {
+            return Err(Report::msg("Offset and length too large"));           
+        }
+
+        std::slice::from_raw_parts(ptr, size)
+    };
+
+    return Ok(sram[offset..(offset+length)].to_owned())
+}

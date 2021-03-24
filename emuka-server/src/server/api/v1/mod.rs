@@ -198,6 +198,26 @@ async fn read_memory (
     }
 }
 
+async fn read_bulk_save_memory(
+    request: ReadBulkSaveMemoryRequestApi,
+    emulator_sender: EmulatorCommandSender
+) -> Result<warp::reply::Response, warp::Rejection> {
+    let (os_sender, os_receiver) = oneshot::channel::<Option<Vec<u8>>>();
+
+    emulator_sender.send_command(EmulatorCommand::ReadBulkSaveMemory(request.offset, request.length, os_sender));
+
+    let value = os_receiver.await.unwrap();
+
+    match value {
+        Some(data) => {
+            Ok(warp::reply::with_status(warp::reply::json(&data), warp::http::StatusCode::OK).into_response())
+        }
+        None => {
+            Ok(warp::reply::with_status(warp::reply(), warp::http::StatusCode::BAD_REQUEST).into_response())
+        }
+    }
+}
+
 async fn write_memory (
     request: WriteMemoryRequestApi,
     emulator_sender: EmulatorCommandSender
@@ -316,6 +336,14 @@ pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommand
         .and(emulator_command_filter.clone())
         .and_then(read_memory);
 
+    let read_bulk_save_memory_f = warp::post()
+        .and(warp::path("internal"))
+        .and(warp::path("read_bulk_save_memory"))
+        .and(warp::path::end())
+        .and(post_json::<ReadBulkSaveMemoryRequestApi>())
+        .and(emulator_command_filter.clone())
+        .and_then(read_bulk_save_memory);
+
 
     let write_memory_f = warp::post()
         .and(warp::path("internal"))
@@ -350,8 +378,12 @@ pub fn routes(emulator_sender: EmulatorCommandSender, audio_sender: AudioCommand
     .or(get_audio_samples_f)
     
     .or(run_stealth_f)
+
     .or(read_memory_f)
+    .or(read_bulk_save_memory_f)
+    
     .or(write_memory_f)
+    
     .or(burst_f)
     
     .boxed()

@@ -166,6 +166,14 @@ impl SameBoyEmulator {
         sender.send(self.read_memory(request)).unwrap()
     }
 
+    fn read_bulk_save_memory(&mut self, offset: usize, length: usize) -> Option<Vec<u8>> {
+        wrapper::get_sram(offset, length).ok()
+    }
+
+    fn read_bulk_save_memory_and_send(&mut self, offset: usize, length: usize, sender: Sender<Option<Vec<u8>>>) {
+        sender.send(self.read_bulk_save_memory(offset, length)).unwrap()
+    }
+
     fn write_memory(&mut self, request: String) -> Option<String> {
         if RE_IS_ASSIGNMENT.find(&request).is_none() {
             return None;
@@ -231,6 +239,7 @@ impl super::Emulator for SameBoyEmulator {
             RunFrame => self.run_frame(),
             RunStealth(jump_location, state, sender) => self.run_stealth_and_send(jump_location, state, sender),
             ReadMemory(request, sender) => self.read_memory_and_send(request, sender),
+            ReadBulkSaveMemory(offset, length, sender) => {self.read_bulk_save_memory_and_send(offset, length, sender)}
             WriteMemory(request, sender) => self.write_memory_and_send(request, sender),
             GetScreenData(sender) => sender.send(wrapper::get_screen_data()).unwrap(),
             Input((input, pressed)) => {

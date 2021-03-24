@@ -100,6 +100,12 @@ pub struct WriteMemoryRequestApi {
     pub request: String,
 }
 
+#[derive(Debug, Deserialize, Clone)]
+pub struct ReadBulkSaveMemoryRequestApi {
+    pub offset: usize,
+    pub length: usize
+}
+
 #[derive(Debug, Serialize, Clone)]
 pub struct WriteMemoryResponseApi {
     pub result: String
