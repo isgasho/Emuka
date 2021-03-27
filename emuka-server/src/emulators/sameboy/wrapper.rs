@@ -616,9 +616,6 @@ pub fn get_sram(offset: usize, length: usize) -> Result<Vec<u8>> {
         let ptr: *const u8 = bindings::retro_get_memory_data(id).cast();
         let size = bindings::retro_get_memory_size(id) as usize;
 
-        println!("{}", size);
-
-
         if offset + length >= size {
             return Err(Report::msg("Offset and length too large"));           
         }
